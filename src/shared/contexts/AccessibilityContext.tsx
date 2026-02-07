@@ -30,10 +30,14 @@ export const AccessibilityProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [isHighContrastMode])
 
-  // Apply font size
+  // Apply font size - actually scale the entire page
   useEffect(() => {
     localStorage.setItem('accessibilityFontSize', fontSize.toString())
     document.documentElement.style.setProperty('--accessibility-font-scale', `${fontSize / 100}`)
+    // Apply real font-size scaling to html element
+    const basePx = 16 * (fontSize / 100)
+    document.documentElement.style.fontSize = `${basePx}px`
+    document.documentElement.setAttribute('data-font-size', fontSize.toString())
   }, [fontSize])
 
   // Save TTS preference

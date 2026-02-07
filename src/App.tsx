@@ -104,6 +104,7 @@ const AppRoutes = () => {
       
       {/* Default routes */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )

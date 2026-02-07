@@ -15,6 +15,12 @@ export { Spinner, default as SpinnerComponent } from './Spinner'
 export { TextInput, TextInput as TextInputComponent } from './TextInput'
 export { default as Toast, default as ToastComponent } from './Toast'
 
+// Animations
+export { default as SplitText, WelcomeText } from './SplitText'
+
+// Accessibility
+export { default as AccessibilityControls } from './AccessibilityControls'
+
 // Molecules
 export { DatePicker, default as DatePickerComponent } from './DatePicker'
 export { FormField, default as FormFieldComponent } from './FormField'
