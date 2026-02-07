@@ -12,7 +12,6 @@ import { Button } from '@components/Button'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Spinner } from '@components/Spinner'
-import Header from '@components/Header'
 import { visitService } from '@core/services/visit.service'
 import { Visit } from '@types'
 
@@ -65,11 +64,7 @@ const VisitsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="py-8">
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
             <div>
@@ -159,8 +154,6 @@ const VisitsPage: React.FC = () => {
               ))
             )}
           </div>
-        </div>
-      </div>
     </div>
   )
 }

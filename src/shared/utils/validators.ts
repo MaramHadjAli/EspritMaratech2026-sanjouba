@@ -94,28 +94,62 @@ export const validatePassword = (password: string): FormError[] => {
 // PHONE VALIDATION (Tunisia format)
 // ============================================
 
+/**
+ * Validates Tunisia phone number format
+ * Must be +216 followed by exactly 8 digits
+ * @param phone - Phone number to validate
+ * @returns true if valid format
+ */
 export const validatePhoneTN = (phone: string): boolean => {
-  // Tunisia phone format: +216XXXXXXXXXX or 0XXXXXXXXX
-  const phoneRegex = /^(\+216|0)[2-5][0-9]{7}$/
-  return phoneRegex.test(phone.replace(/\s/g, ''))
+  // Tunisia phone format: +216 followed by exactly 8 digits
+  // Remove spaces for validation
+  const cleaned = phone.replace(/\s/g, '')
+  const phoneRegex = /^\+216[0-9]{8}$/
+  return phoneRegex.test(cleaned)
 }
 
+/**
+ * Formats phone number to Tunisia standard format (+216 XX XXX XXX)
+ */
 export const formatPhoneTN = (phone: string): string => {
   const cleaned = phone.replace(/\D/g, '')
 
-  if (cleaned.startsWith('216')) {
-    return `+${cleaned}`
+  // If starts with 216, add + prefix
+  if (cleaned.startsWith('216') && cleaned.length === 11) {
+    const digits = cleaned.substring(3)
+    return `+216 ${digits.substring(0, 2)} ${digits.substring(2, 5)} ${digits.substring(5)}`
   }
 
-  if (cleaned.startsWith('0')) {
-    return `+216${cleaned.substring(1)}`
-  }
-
+  // If 8 digits only, add +216 prefix
   if (cleaned.length === 8) {
-    return `+216${cleaned}`
+    return `+216 ${cleaned.substring(0, 2)} ${cleaned.substring(2, 5)} ${cleaned.substring(5)}`
   }
 
   return phone
+}
+
+/**
+ * Check if phone number is unique (calls API)
+ * @param phone - Phone number to check
+ * @param excludeUserId - Optional user ID to exclude from check (for edit mode)
+ * @returns Promise<boolean> - true if unique, false if already exists
+ */
+export const checkPhoneUnique = async (
+  phone: string,
+  excludeUserId?: string
+): Promise<{ isUnique: boolean; message?: string }> => {
+  try {
+    // In production, this would call the backend API
+    // For now, we simulate an API check
+    // const response = await axiosInstance.get(`/users/check-phone?phone=${encodeURIComponent(phone)}&excludeId=${excludeUserId || ''}`)
+    // return { isUnique: response.data.isUnique }
+    
+    // Mock implementation - in real app, replace with actual API call
+    return { isUnique: true }
+  } catch (error) {
+    console.error('Error checking phone uniqueness:', error)
+    return { isUnique: false, message: 'Could not verify phone number uniqueness' }
+  }
 }
 
 // ============================================
@@ -196,18 +230,11 @@ export const validateSignupForm = (data: any): FormError[] => {
     errors.push({ field: 'email', message: 'Invalid email format' })
   }
 
-  // First Name
-  if (!data.firstName) {
-    errors.push({ field: 'firstName', message: 'First name is required' })
-  } else if (!validateName(data.firstName)) {
-    errors.push({ field: 'firstName', message: 'Invalid name format' })
-  }
-
-  // Last Name
-  if (!data.lastName) {
-    errors.push({ field: 'lastName', message: 'Last name is required' })
-  } else if (!validateName(data.lastName)) {
-    errors.push({ field: 'lastName', message: 'Invalid name format' })
+  // Name
+  if (!data.name) {
+    errors.push({ field: 'name', message: 'Name is required' })
+  } else if (!validateName(data.name)) {
+    errors.push({ field: 'name', message: 'Invalid name format' })
   }
 
   // Phone

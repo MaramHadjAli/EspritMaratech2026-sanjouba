@@ -9,6 +9,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useNotification } from '@hooks/useNotification'
+import { validatePhoneTN, checkPhoneUnique } from '@utils/validators'
 import { Button } from '@components/Button'
 import { TextInput } from '@components/TextInput'
 import { PasswordInput } from '@components/PasswordInput'
@@ -22,9 +23,9 @@ const AddEmployeePage: React.FC = () => {
   const { addNotification } = useNotification()
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [isChecking, setIsChecking] = useState(false)
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phoneNumber: '',
     password: '',
@@ -69,11 +70,8 @@ const AddEmployeePage: React.FC = () => {
 
     switch (stepNum) {
       case 1:
-        if (!formData.firstName.trim()) {
-          newErrors.firstName = t('validation.firstNameRequired')
-        }
-        if (!formData.lastName.trim()) {
-          newErrors.lastName = t('validation.lastNameRequired')
+        if (!formData.name.trim()) {
+          newErrors.name = t('validation.nameRequired')
         }
         break
       case 2:
@@ -84,6 +82,8 @@ const AddEmployeePage: React.FC = () => {
         }
         if (!formData.phoneNumber) {
           newErrors.phoneNumber = t('validation.phoneRequired')
+        } else if (!validatePhoneTN(formData.phoneNumber)) {
+          newErrors.phoneNumber = t('validation.invalidPhoneFormat')
         }
         break
       case 3:
@@ -102,10 +102,30 @@ const AddEmployeePage: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleNext = () => {
-    if (validateStep(step)) {
-      setStep((prev) => (prev + 1) as 1 | 2 | 3)
+  const handleNext = async () => {
+    if (!validateStep(step)) return
+    
+    // Check phone uniqueness when moving from step 2 to step 3
+    if (step === 2) {
+      setIsChecking(true)
+      try {
+        const uniqueCheck = await checkPhoneUnique(formData.phoneNumber)
+        if (!uniqueCheck.isUnique) {
+          setErrors((prev) => ({
+            ...prev,
+            phoneNumber: t('validation.phoneAlreadyExists'),
+          }))
+          setIsChecking(false)
+          return
+        }
+      } catch (error) {
+        console.error('Error checking phone uniqueness:', error)
+      } finally {
+        setIsChecking(false)
+      }
     }
+    
+    setStep((prev) => (prev + 1) as 1 | 2 | 3)
   }
 
   const handlePrevious = () => {
@@ -121,9 +141,8 @@ const AddEmployeePage: React.FC = () => {
 
     try {
       await signup({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        fullName: `${formData.firstName} ${formData.lastName}`,
+        name: formData.name,
+        fullName: formData.name,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
@@ -137,8 +156,7 @@ const AddEmployeePage: React.FC = () => {
         duration: 3000,
       })
       setFormData({
-        firstName: '',
-        lastName: '',
+        name: '',
         email: '',
         phoneNumber: '',
         password: '',
@@ -208,20 +226,12 @@ const AddEmployeePage: React.FC = () => {
           {/* Step 1: Personal Info */}
           {step === 1 && (
             <>
-              <FormField label={t('auth.firstName')} error={errors.firstName} required>
+              <FormField label={t('auth.name')} error={errors.name} required>
                 <TextInput
-                  name="firstName"
-                  value={formData.firstName}
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
-                  placeholder={t('auth.firstNamePlaceholder')}
-                />
-              </FormField>
-              <FormField label={t('auth.lastName')} error={errors.lastName} required>
-                <TextInput
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder={t('auth.lastNamePlaceholder')}
+                  placeholder={t('auth.namePlaceholder')}
                 />
               </FormField>
             </>
@@ -279,8 +289,13 @@ const AddEmployeePage: React.FC = () => {
               </Button>
             )}
             {step < 3 && (
-              <Button type="button" fullWidth onClick={handleNext}>
-                {t('common.next')}
+              <Button 
+                type="button" 
+                fullWidth 
+                onClick={handleNext}
+                disabled={isChecking}
+              >
+                {isChecking ? t('common.verifying') : t('common.next')}
               </Button>
             )}
             {step === 3 && (

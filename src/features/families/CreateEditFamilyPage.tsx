@@ -12,7 +12,6 @@ import { familyService } from '@services/family.service'
 import { Card } from '@components/Card'
 import { FormField } from '@components/FormField'
 import { Button } from '@components/Button'
-import Header from '@components/Header'
 import type { AddFamilyData } from '@/shared/types'
 
 const CreateEditFamilyPage: React.FC = () => {
@@ -26,8 +25,7 @@ const CreateEditFamilyPage: React.FC = () => {
     formState: { errors },
   } = useForm<AddFamilyData>({
     defaultValues: {
-      firstName: '',
-      lastName: '',
+      name: '',
       phoneNumber: '',
       address: '',
       familySize: 1,
@@ -72,11 +70,7 @@ const CreateEditFamilyPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto">
+    <div className="py-8 max-w-2xl mx-auto">
           {/* Navigation */}
           <button
             onClick={() => navigate(isEditing ? `/families/${id}` : '/families')}
@@ -97,32 +91,17 @@ const CreateEditFamilyPage: React.FC = () => {
             </p>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* First Name */}
+              {/* Name */}
               <FormField
-                label="First Name"
-                error={errors.firstName?.message}
+                label="Name"
+                error={errors.name?.message}
               >
                 <input
-                  {...register('firstName', {
-                    required: 'First name is required',
+                  {...register('name', {
+                    required: 'Name is required',
                   })}
                   type="text"
-                  placeholder="Enter first name"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </FormField>
-
-              {/* Last Name */}
-              <FormField
-                label="Last Name"
-                error={errors.lastName?.message}
-              >
-                <input
-                  {...register('lastName', {
-                    required: 'Last name is required',
-                  })}
-                  type="text"
-                  placeholder="Enter last name"
+                  placeholder="Enter name"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </FormField>
@@ -185,8 +164,6 @@ const CreateEditFamilyPage: React.FC = () => {
               </div>
             </form>
           </Card>
-        </div>
-      </div>
     </div>
   )
 }
