@@ -131,7 +131,23 @@
     "textToSpeech": "Lecture vocale",
     "textToSpeechStart": "Démarrer la lecture",
     "textToSpeechStop": "Arrêter la lecture",
-    "resetSettings": "Réinitialiser les paramètres"
+    "resetSettings": "Réinitialiser les paramètres",
+    "skipToContent": "Passer au contenu principal",
+    "openMenu": "Ouvrir le menu de navigation",
+    "closeMenu": "Fermer le menu de navigation",
+    "menuOpen": "Menu ouvert",
+    "menuClosed": "Menu fermé",
+    "expandSection": "Développer la section : {{section}}",
+    "collapseSection": "Réduire la section : {{section}}",
+    "sectionExpanded": "Section {{section}} développée",
+    "sectionCollapsed": "Section {{section}} réduite",
+    "loading": "Le contenu se charge",
+    "loadingComplete": "Contenu chargé avec succès",
+    "error": "Erreur détectée : {{error}}",
+    "closeNotification": "Fermer la notification",
+    "notificationAdded": "Nouvelle notification : {{message}}",
+    "formError": "Le formulaire contient des erreurs. Veuillez vérifier avant d'envoyer",
+    "fieldError": "{{field}} : {{error}}"
   },
   "landing": {
     "hero": {
@@ -357,23 +373,5 @@
     "pattern": "Veuillez entrer un {{field}} valide",
     "passwordRequirements": "Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial",
     "invalidPhone": "Veuillez entrer un numéro de téléphone valide"
-  },
-  "accessibility": {
-    "skipToContent": "Passer au contenu principal",
-    "openMenu": "Ouvrir le menu de navigation",
-    "closeMenu": "Fermer le menu de navigation",
-    "menuOpen": "Menu ouvert",
-    "menuClosed": "Menu fermé",
-    "expandSection": "Développer la section : {{section}}",
-    "collapseSection": "Réduire la section : {{section}}",
-    "sectionExpanded": "Section {{section}} développée",
-    "sectionCollapsed": "Section {{section}} réduite",
-    "loading": "Le contenu se charge",
-    "loadingComplete": "Contenu chargé avec succès",
-    "error": "Erreur détectée : {{error}}",
-    "closeNotification": "Fermer la notification",
-    "notificationAdded": "Nouvelle notification : {{message}}",
-    "formError": "Le formulaire contient des erreurs. Veuillez vérifier avant d'envoyer",
-    "fieldError": "{{field}} : {{error}}"
   }
 }

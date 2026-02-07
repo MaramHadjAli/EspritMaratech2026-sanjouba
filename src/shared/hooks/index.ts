@@ -7,6 +7,7 @@ export { useAuth, useIsAuthenticated, useCurrentUser, useIsAdmin, useIsEmployee 
 export { useTheme } from './useTheme'
 export { useLanguage, useI18n } from './useLanguage'
 export { useNotification, useToast } from './useNotification'
+export { useDashboardStats, resetDashboardStatsCache } from './useDashboardStats'
 
 // Accessibility hook for context
 import { useContext } from 'react'

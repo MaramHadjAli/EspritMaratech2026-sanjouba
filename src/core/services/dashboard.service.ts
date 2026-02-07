@@ -4,7 +4,7 @@
  */
 
 import axiosInstance from '../api/axiosInstance'
-import { ApiResponse, DashboardStats, RegionalStats } from '@shared/types'
+import { ApiResponse, DashboardStats } from '@shared/types'
 
 export const dashboardService = {
   /**
@@ -52,68 +52,189 @@ export const dashboardService = {
   },
 
   /**
-   * Get regional statistics
+   * Visits timeline for a period (months)
    */
-  getRegionalStats: async (region?: string): Promise<ApiResponse<RegionalStats[]>> => {
-    const response = await axiosInstance.get('/dashboard/regional-stats', {
-      params: { region },
+  getVisitsTimeline: async (months = 6): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/visits/timeline', {
+      params: { months },
+    })
+    console.log('📊 Visits timeline response:', response.data)
+    return response.data
+  },
+
+  /**
+   * Aid distribution pie
+   */
+  getAidsPie: async (limit = 6): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/aids/pie', {
+      params: { limit },
+    })
+    console.log('📊 Aids pie response:', response.data)
+    return response.data
+  },
+
+  /**
+   * Families size distribution
+   */
+  getFamiliesSizeDistribution: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/families/size-distribution')
+    console.log('📊 Families size distribution response:', response.data)
+    return response.data
+  },
+
+  /**
+   * Priority families list
+   */
+  getPriorityFamilies: async (limit = 5): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/ai/priority-families', {
+      params: { limit },
     })
     return response.data
   },
 
   /**
-   * Get aid distribution analytics
+   * City metrics for map
    */
-  getAidDistribution: async (): Promise<ApiResponse<any>> => {
-    const response = await axiosInstance.get('/dashboard/aid-distribution')
-    return response.data
-  },
-
-  /**
-   * Get coverage evolution over time
-   */
-  getCoverageEvolution: async (startYear?: number, endYear?: number): Promise<ApiResponse<any>> => {
-    const response = await axiosInstance.get('/dashboard/coverage-evolution', {
-      params: { startYear, endYear },
+  getCitiesVisits: async (limit = 10): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/cities/visits', {
+      params: { limit },
     })
     return response.data
   },
 
-  /**
-   * Get heatmap data for families by region
-   */
-  getHeatmapData: async (): Promise<ApiResponse<any>> => {
-    const response = await axiosInstance.get('/dashboard/heatmap')
-    return response.data
-  },
-
-  /**
-   * Export dashboard report as PDF
-   */
-  exportDashboardPDF: async (filters?: Record<string, any>): Promise<Blob> => {
-    const response = await axiosInstance.get('/dashboard/export/pdf', {
-      params: filters,
-      responseType: 'blob',
+  getCitiesFamilies: async (limit = 10): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/cities/families', {
+      params: { limit },
     })
     return response.data
   },
 
-  /**
-   * Export dashboard report as Excel
-   */
-  exportDashboardExcel: async (filters?: Record<string, any>): Promise<Blob> => {
-    const response = await axiosInstance.get('/dashboard/export/excel', {
-      params: filters,
-      responseType: 'blob',
+  // Time series endpoints
+  getTimeFamilies: async (months = 6): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/time/families', {
+      params: { months },
     })
     return response.data
   },
 
-  /**
-   * Get top statistics (highlights)
-   */
-  getTopStats: async (): Promise<ApiResponse<any>> => {
-    const response = await axiosInstance.get('/dashboard/top-stats')
+  getTimeVisits: async (months = 6): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/time/visits', {
+      params: { months },
+    })
+    return response.data
+  },
+
+  getTimeNeedyComparison: async (months = 6): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/time/needy-comparison', {
+      params: { months },
+    })
+    return response.data
+  },
+
+  // Aid endpoints
+  getAidsFrequency: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/aids/frequency')
+    return response.data
+  },
+
+  getAidsTypeBreakdown: async (region?: string, limit = 10): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/aids/type-breakdown', {
+      params: { region, limit },
+    })
+    return response.data
+  },
+
+  getAidsTypeBreakdownByRegion: async (limit = 10): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/aids/type-breakdown/by-region', {
+      params: { limit },
+    })
+    return response.data
+  },
+
+  getAidsByCityTop: async (city: string, n = 5): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get(`/dashboard/aids/city/${city}/top/${n}`)
+    return response.data
+  },
+
+  // Family endpoints
+  getFamiliesHistogram: async (months = 6): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/families/histogram', {
+      params: { months },
+    })
+    return response.data
+  },
+
+  getFamiliesVulnerabilityProfile: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/families/vulnerability-profile')
+    return response.data
+  },
+
+  getFamiliesCount: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/families/count')
+    return response.data
+  },
+
+  // Visit endpoints
+  getVisitsCompletionRate: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/visits/completion-rate')
+    return response.data
+  },
+
+  getVisitsCount: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/visits/count')
+    return response.data
+  },
+
+  // Deposit endpoints
+  getDepositsSummary: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/deposits/summary')
+    return response.data
+  },
+
+  getDepositsHistory: async (depositId: string, limit = 10): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get(`/dashboard/deposits/${depositId}/history`, {
+      params: { limit },
+    })
+    return response.data
+  },
+
+  // User endpoints
+  getUsersActivity: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/users/activity')
+    return response.data
+  },
+
+  // AI endpoints
+  getAiRiskMap: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/ai/risk-map')
+    return response.data
+  },
+
+  // Financial endpoints
+  getAidsFinancialTotalDistributed: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/aids/financial/total-distributed')
+    return response.data
+  },
+
+  // Cities endpoints
+  getCitiesActiveCount: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/cities/active/count')
+    return response.data
+  },
+
+  // Heatmap endpoints
+  getHeatmapFamilies: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/heatmap/families')
+    return response.data
+  },
+
+  getHeatmapVisits: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/heatmap/visits')
+    return response.data
+  },
+
+  getCitiesAidsHeatmap: async (): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get('/dashboard/cities/aids/heatmap')
     return response.data
   },
 }

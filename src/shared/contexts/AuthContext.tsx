@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
 import { User, AuthContextType, SignupFormData } from '@types'
 import { authService } from '@services/auth.service'
 
@@ -16,6 +16,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(localStorage.getItem('authToken'))
   const [isLoading, setIsLoading] = useState(false)
+  const [isRestoring, setIsRestoring] = useState(!!localStorage.getItem('authToken'))
+  const isRestorationAttemptedRef = useRef(false)
 
   useEffect(() => {
     // Restore auth state from localStorage
@@ -27,6 +29,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('🔐 [AuthContext] Restored from localStorage')
     }
   }, [])
+
+  useEffect(() => {
+    if (!token || user || isRestorationAttemptedRef.current) {
+      setIsRestoring(false)
+      return
+    }
+
+    const restoreUser = async () => {
+      isRestorationAttemptedRef.current = true
+      try {
+        const response = await authService.getCurrentUser()
+        const payload = response.data ?? response
+        const resolvedUser = (payload as any)?.user ?? payload
+
+        if (resolvedUser) {
+          setUser(resolvedUser)
+          localStorage.setItem('authUser', JSON.stringify(resolvedUser))
+          console.log('🔐 [AuthContext] Restored user from API')
+        }
+      } catch (error) {
+        console.error('❌ [AuthContext] Failed to restore user from API:', error)
+        localStorage.removeItem('authToken')
+        localStorage.removeItem('authUser')
+        setToken(null)
+        setUser(null)
+      } finally {
+        setIsRestoring(false)
+      }
+    }
+
+    restoreUser()
+  }, [token, user])
 
   // Log when user state changes
   useEffect(() => {
@@ -101,6 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     token,
     isAuthenticated: !!token && !!user,
     isLoading,
+    isRestoring,
     login,
     signup,
     logout,

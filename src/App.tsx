@@ -32,7 +32,11 @@ import Layout from './core/layout/Layout'
 
 // Protected route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isRestoring } = useAuth()
+  
+  if (isRestoring) {
+    return <div className="min-h-screen" />
+  }
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
@@ -43,7 +47,11 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 // Protected admin-only route wrapper
 const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, isRestoring } = useAuth()
+  
+  if (isRestoring) {
+    return <div className="min-h-screen" />
+  }
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
@@ -57,52 +65,46 @@ const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children
 }
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth()
-
   return (
     <Routes>
-      {isAuthenticated ? (
-        // Authenticated routes - wrapped in Layout
-        <Route element={<Layout />}>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/profile/edit" element={<ProfileEditPage />} />
-          <Route path="/profile/change-password" element={<ChangePasswordPage />} />
-          
-          {/* Admin routes */}
-          <Route path="/employees/add" element={<ProtectedAdminRoute><AddEmployeePage /></ProtectedAdminRoute>} />
-          
-          {/* Visits routes */}
-          <Route path="/visits" element={<VisitsPage />} />
-          <Route path="/visits/create" element={<CreateEditVisitPage />} />
-          <Route path="/visits/:id" element={<VisitDetailPage />} />
-          <Route path="/visits/:id/edit" element={<CreateEditVisitPage />} />
-          
-          {/* Families routes */}
-          <Route path="/families" element={<FamiliesPage />} />
-          <Route path="/families/add" element={<CreateEditFamilyPage />} />
-          <Route path="/families/:id" element={<FamilyDetailPage />} />
-          <Route path="/families/:id/edit" element={<CreateEditFamilyPage />} />
-          
-          {/* Aid routes */}
-          <Route path="/aid" element={<AidPage />} />
-          <Route path="/aid/add" element={<CreateEditAidPage />} />
-          <Route path="/aid/:id" element={<AidDetailPage />} />
-          <Route path="/aid/:id/edit" element={<CreateEditAidPage />} />
-          
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      ) : (
-        // Public routes
-        <>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<LandingPage />} />
-          <Route path="*" element={<NotFound />} />
-        </>
-      )}
+      {/* Public routes */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Protected routes - wrapped in Layout */}
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/profile/edit" element={<ProfileEditPage />} />
+        <Route path="/profile/change-password" element={<ChangePasswordPage />} />
+        
+        {/* Admin routes */}
+        <Route path="/employees/add" element={<ProtectedAdminRoute><AddEmployeePage /></ProtectedAdminRoute>} />
+        
+        {/* Visits routes */}
+        <Route path="/visits" element={<VisitsPage />} />
+        <Route path="/visits/create" element={<CreateEditVisitPage />} />
+        <Route path="/visits/:id" element={<VisitDetailPage />} />
+        <Route path="/visits/:id/edit" element={<CreateEditVisitPage />} />
+        
+        {/* Families routes */}
+        <Route path="/families" element={<FamiliesPage />} />
+        <Route path="/families/add" element={<CreateEditFamilyPage />} />
+        <Route path="/families/:id" element={<FamilyDetailPage />} />
+        <Route path="/families/:id/edit" element={<CreateEditFamilyPage />} />
+        
+        {/* Aid routes */}
+        <Route path="/aid" element={<AidPage />} />
+        <Route path="/aid/add" element={<CreateEditAidPage />} />
+        <Route path="/aid/:id" element={<AidDetailPage />} />
+        <Route path="/aid/:id/edit" element={<CreateEditAidPage />} />
+      </Route>
+      
+      {/* Default routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

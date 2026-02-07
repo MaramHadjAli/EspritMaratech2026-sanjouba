@@ -57,6 +57,10 @@ GET /dashboard/deposits/:id/history?limit=
 GET /dashboard/users/activity
 GET /dashboard/ai/risk-map
 GET /dashboard/ai/priority-families?limit=
+GET /dashboard/aids/financial/total-distributed
+GET /dashboard/families/count
+GET /dashboard/visits/count
+GET dashboard/cities/active/count
 
 Deposits
 --------

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useNotification } from '@hooks/useNotification'
+import { useDashboardStats } from '@hooks/useDashboardStats'
 import { Button } from '@components/Button'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
@@ -15,7 +16,8 @@ import { Spinner } from '@components/Spinner'
 import Header from '@components/Header'
 import { Visit } from '@types'
 import { visitService } from '@core/services/visit.service'
-import { dashboardService } from '@core/services/dashboard.service'
+
+
 
 interface DashboardStats {
   totalFamilies: number
@@ -27,60 +29,53 @@ interface DashboardStats {
 const HomePage: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, isRestoring } = useAuth()
   const { addNotification } = useNotification()
+  const { stats, loading: statsLoading } = useDashboardStats()
 
   const [loading, setLoading] = useState(true)
-  const [stats, setStats] = useState<DashboardStats>({
-    totalFamilies: 0,
-    totalVisits: 0,
-    totalAidDistributed: 0,
-    totalRegions: 0,
-  })
   const [upcomingVisits, setUpcomingVisits] = useState<Visit[]>([])
 
   useEffect(() => {
+    if (isRestoring) {
+      return
+    }
+
     if (!user) {
       navigate('/login')
       return
     }
 
-    const fetchData = async () => {
+    const fetchVisits = async () => {
       try {
         setLoading(true)
         
-        // Fetch dashboard stats
-        const dashboardData = await dashboardService.getDashboardStats({})
-        setStats({
-          totalFamilies: dashboardData.data?.totalFamilies || 0,
-          totalVisits: dashboardData.data?.totalVisits || 0,
-          totalAidDistributed: dashboardData.data?.totalAidsDistributed || 0,
-          totalRegions: dashboardData.data?.totalRegions || 0,
-        })
-
         // Fetch upcoming visits
         const visitsData = await visitService.getUpcomingVisits()
-        const mappedVisits: UpcomingVisit[] = (visitsData.data?.slice(0, 5) || []).map(visit => ({
-          id: visit.id,
-          title: visit.campaignName || 'Visit',
-          date: visit.startTime || new Date().toISOString(),
-          location: visit.address || 'N/A',
-          participants: visit.members?.length || visit.personCount || 0,
+        const mappedVisits: Visit[] = (visitsData.data?.slice(0, 5) || []).map(visit => ({
+          id: visit.id || '',
+          campaignName: visit.campaignName || 'Visit',
+          startTime: visit.startTime || new Date().toISOString(),
+          address: visit.address || 'N/A',
+          personCount: visit.members?.length || visit.personCount || 0,
           status: visit.status || 'ACTIVE',
+          cityName: visit.cityName || '',
+          familyId: visit.familyId || '',
+          employeeId: visit.employeeId || ''
         }))
         setUpcomingVisits(mappedVisits)
       } catch (error) {
-        console.error('Failed to fetch data:', error)
-        addNotification({ type: 'error', message: 'Failed to load dashboard data' })
+        console.error('Failed to fetch visits:', error)
+        addNotification({ type: 'error', message: 'Failed to load upcoming visits' })
       } finally {
         setLoading(false)
       }
     }
 
-    fetchData()
-  }, [user, navigate, addNotification])
+    fetchVisits()
+  }, [user, navigate, addNotification, isRestoring])
 
-  if (loading) {
+  if (loading || statsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <Spinner size="lg" label={t('common.loading') || 'Loading...'} />

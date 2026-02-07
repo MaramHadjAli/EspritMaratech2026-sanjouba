@@ -14,9 +14,7 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
@@ -30,6 +28,7 @@
       "@components/*": ["src/shared/components/*"],
       "@utils/*": ["src/shared/utils/*"],
       "@services/*": ["src/core/services/*"],
+      "@stores/*": ["src/shared/stores/*"],
       "@validators/*": ["src/shared/utils/*"],
       "@formatters/*": ["src/shared/utils/*"],
       "@styles/*": ["src/styles/*"]

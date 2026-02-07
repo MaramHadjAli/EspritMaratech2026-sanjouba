@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useTheme } from '@hooks/useTheme'
@@ -12,6 +12,12 @@ const Header: React.FC = () => {
   const { isDarkMode, toggleDarkMode } = useTheme()
   const { language, setLanguage, isRTL } = useLanguage()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
@@ -96,7 +102,7 @@ const Header: React.FC = () => {
               </p>
             </div>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="text-red-600 hover:text-red-700 text-sm font-medium"
             >
               Logout
@@ -131,8 +137,8 @@ const Header: React.FC = () => {
           </Link>
           <button
             onClick={() => {
-              logout()
               setIsMenuOpen(false)
+              handleLogout()
             }}
             className="block w-full text-left px-3 py-2 text-red-600 hover:text-red-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >

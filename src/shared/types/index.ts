@@ -37,6 +37,7 @@ export interface AuthContextType {
   token: string | null
   isAuthenticated: boolean
   isLoading: boolean
+  isRestoring: boolean
   login: (email: string, password: string) => Promise<void>
   signup: (data: SignupFormData) => Promise<void>
   logout: () => void
@@ -185,6 +186,9 @@ export interface Visit {
   createdBy?: string
   members?: string[]
   status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
+  cityName?: string
+  familyId?: string
+  employeeId?: string
 }
 
 export interface CreateVisitData {
@@ -272,6 +276,20 @@ export interface RegionalStats {
   region: string
   familiesCount: number
   visitsCount: number
+}
+
+export interface CityBoundary {
+  id: string
+  city: string
+  region: string | null
+  countryCode: string | null
+  geojson: Record<string, unknown>
+  bbox: [number, number, number, number] | null
+  source: string | null
+  externalId: string | null
+  externalType: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 // ============================================
