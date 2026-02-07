@@ -162,7 +162,6 @@ const CreateEditVisitPage: React.FC = () => {
               </div>
             </form>
           </Card>
-        </div>
     </div>
   )
 }

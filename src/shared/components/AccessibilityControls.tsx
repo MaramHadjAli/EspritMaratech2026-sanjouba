@@ -3,9 +3,18 @@
  * Provides UI controls for accessibility settings (contrast, text size, TTS)
  */
 
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useAccessibilitySettings } from '@hooks'
+import { AccessibilityContext } from '@contexts/AccessibilityContext'
+import type { AccessibilityContextType } from '@types'
+
+const useAccessibilitySettings = (): AccessibilityContextType => {
+  const context = useContext(AccessibilityContext)
+  if (!context) {
+    throw new Error('useAccessibilitySettings must be used within AccessibilityProvider')
+  }
+  return context
+}
 
 const AccessibilityControls: React.FC = () => {
   const { t } = useTranslation()

@@ -164,7 +164,6 @@ const CreateEditFamilyPage: React.FC = () => {
               </div>
             </form>
           </Card>
-        </div>
     </div>
   )
 }

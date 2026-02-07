@@ -274,7 +274,6 @@ const DashboardPage: React.FC = () => {
               Back to Home
             </Button>
           </div>
-        </div>
     </div>
   )
 }

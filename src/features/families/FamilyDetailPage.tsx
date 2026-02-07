@@ -269,7 +269,6 @@ const FamilyDetailPage: React.FC = () => {
               </div>
             </div>
           </Card>
-        </div>
     </div>
   )
 }
