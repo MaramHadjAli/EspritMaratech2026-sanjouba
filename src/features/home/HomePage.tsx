@@ -12,17 +12,10 @@ import { Button } from '@components/Button'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Spinner } from '@components/Spinner'
+import Header from '@components/Header'
+import { Visit } from '@types'
 import { visitService } from '@core/services/visit.service'
 import { dashboardService } from '@core/services/dashboard.service'
-
-interface UpcomingVisit {
-  id: string
-  title: string
-  date: string
-  location: string
-  participants: number
-  status: string
-}
 
 interface DashboardStats {
   totalFamilies: number
@@ -44,7 +37,7 @@ const HomePage: React.FC = () => {
     totalAidDistributed: 0,
     totalRegions: 0,
   })
-  const [upcomingVisits, setUpcomingVisits] = useState<UpcomingVisit[]>([])
+  const [upcomingVisits, setUpcomingVisits] = useState<Visit[]>([])
 
   useEffect(() => {
     if (!user) {
@@ -230,16 +223,16 @@ const HomePage: React.FC = () => {
                   >
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {visit.title}
+                        {visit.campaignName}
                       </h3>
                       <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span>📅 {visit.date}</span>
-                        <span>📍 {visit.location}</span>
-                        <span>👥 {visit.participants} participants</span>
+                        {visit.startTime && <span>📅 {new Date(visit.startTime).toLocaleDateString()}</span>}
+                        {visit.address && <span>📍 {visit.address}</span>}
+                        {visit.personCount && <span>👥 {visit.personCount} participants</span>}
                       </div>
                     </div>
                     <div className="ml-4">
-                      <Badge variant="success">{visit.status}</Badge>
+                      <Badge variant="success">{visit.status || 'ACTIVE'}</Badge>
                     </div>
                   </div>
                 ))}

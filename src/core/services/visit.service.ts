@@ -11,7 +11,7 @@ export const visitService = {
    * Get all visits with pagination
    */
   getAllVisits: async (page = 1, limit = 20, filters?: Record<string, any>): Promise<ApiResponse<PaginatedResponse<Visit>>> => {
-    const response = await axiosInstance.get('/visits', {
+    const response = await axiosInstance.get('/visit', {
       params: { page, limit, ...filters },
     })
     return response.data
@@ -21,7 +21,7 @@ export const visitService = {
    * Get single visit by ID
    */
   getVisitById: async (id: string): Promise<ApiResponse<Visit>> => {
-    const response = await axiosInstance.get(`/visits/${id}`)
+    const response = await axiosInstance.get(`/visit/${id}`)
     return response.data
   },
 
@@ -29,7 +29,7 @@ export const visitService = {
    * Create new visit/campaign
    */
   createVisit: async (data: CreateVisitData): Promise<ApiResponse<Visit>> => {
-    const response = await axiosInstance.post('/visits', data)
+    const response = await axiosInstance.post('/visit', data)
     return response.data
   },
 
@@ -37,7 +37,7 @@ export const visitService = {
    * Update existing visit
    */
   updateVisit: async (id: string, data: Partial<EditVisitData>): Promise<ApiResponse<Visit>> => {
-    const response = await axiosInstance.put(`/visits/${id}`, data)
+    const response = await axiosInstance.put(`/visit/${id}`, data)
     return response.data
   },
 
@@ -45,7 +45,7 @@ export const visitService = {
    * Delete/Archive visit
    */
   deleteVisit: async (id: string): Promise<ApiResponse<{ message: string }>> => {
-    const response = await axiosInstance.delete(`/visits/${id}`)
+    const response = await axiosInstance.delete(`/visit/${id}`)
     return response.data
   },
 
@@ -53,15 +53,17 @@ export const visitService = {
    * Get visits assigned to current user
    */
   getMyVisits: async (): Promise<ApiResponse<Visit[]>> => {
-    const response = await axiosInstance.get('/visits/my-visits')
+    const response = await axiosInstance.get('/visit/my-visits')
     return response.data
   },
 
   /**
    * Get upcoming visits
    */
-  getUpcomingVisits: async (): Promise<ApiResponse<Visit[]>> => {
-    const response = await axiosInstance.get('/visits/upcoming')
+  getUpcomingVisits: async (limit = 5): Promise<ApiResponse<Visit[]>> => {
+    const response = await axiosInstance.get('/visit/upcoming', {
+      params: { limit },
+    })
     return response.data
   },
 
@@ -69,7 +71,7 @@ export const visitService = {
    * Get visit by region
    */
   getVisitsByRegion: async (region: string): Promise<ApiResponse<Visit[]>> => {
-    const response = await axiosInstance.get(`/visits/region/${region}`)
+    const response = await axiosInstance.get(`/visit/region/${region}`)
     return response.data
   },
 
@@ -77,7 +79,7 @@ export const visitService = {
    * Join a visit as a team member
    */
   joinVisit: async (visitId: string): Promise<ApiResponse<Visit>> => {
-    const response = await axiosInstance.post(`/visits/${visitId}/join`)
+    const response = await axiosInstance.post(`/visit/${visitId}/join`)
     return response.data
   },
 
@@ -85,7 +87,7 @@ export const visitService = {
    * Leave a visit
    */
   leaveVisit: async (visitId: string): Promise<ApiResponse<{ message: string }>> => {
-    const response = await axiosInstance.post(`/visits/${visitId}/leave`)
+    const response = await axiosInstance.post(`/visit/${visitId}/leave`)
     return response.data
   },
 
@@ -93,7 +95,7 @@ export const visitService = {
    * Complete a visit
    */
   completeVisit: async (visitId: string): Promise<ApiResponse<Visit>> => {
-    const response = await axiosInstance.post(`/visits/${visitId}/complete`)
+    const response = await axiosInstance.post(`/visit/${visitId}/complete`)
     return response.data
   },
 }

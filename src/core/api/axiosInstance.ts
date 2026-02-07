@@ -3,9 +3,13 @@
  * Configured HTTP client for API calls with interceptors
  */
 
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_BASE_URL = 'http://localhost:3000'
+
+type RetriableAxiosConfig = AxiosRequestConfig & {
+  _retry?: boolean
+}
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -14,12 +18,68 @@ const axiosInstance = axios.create({
   },
 })
 
+// Dedicated client to refresh tokens without triggering interceptors again
+const refreshClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+const redirectToLogin = () => {
+  localStorage.removeItem('authToken')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('authUser')
+  window.location.href = '/login'
+}
+
+const refreshAccessToken = async (): Promise<string | null> => {
+  const storedRefreshToken = localStorage.getItem('refreshToken')
+  if (!storedRefreshToken) {
+    return null
+  }
+
+  try {
+    const response = await refreshClient.post('/auth/refresh', {
+      refreshToken: storedRefreshToken,
+    })
+
+    const { token, refreshToken } = response.data.data || response.data
+    if (!token) {
+      return null
+    }
+
+    localStorage.setItem('authToken', token)
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken)
+    }
+
+    return token
+  } catch (error) {
+    return null
+  }
+}
+
+// Endpoints that should not include the authorization token
+const noAuthEndpoints = ['auth/login', 'auth/refresh', 'auth/register']
+
+const isNoAuthEndpoint = (url: string): boolean => {
+  if (!url) return false
+  // Normalize URL by removing leading slash and query params
+  const cleanUrl = url.split('?')[0].replace(/^\/+/, '').toLowerCase()
+  return noAuthEndpoints.some(endpoint => 
+    cleanUrl === endpoint.toLowerCase() || cleanUrl.startsWith(endpoint.toLowerCase() + '/')
+  )
+}
+
 // Add request interceptor to attach token
 axiosInstance.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    if (!isNoAuthEndpoint(config.url || '')) {
+      const token = localStorage.getItem('authToken')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
     return config
   },
@@ -29,13 +89,32 @@ axiosInstance.interceptors.request.use(
 // Add response interceptor to handle errors
 axiosInstance.interceptors.response.use(
   response => response,
-  error => {
-    if (error.response?.status === 401) {
-      // Clear storage and redirect to login
-      localStorage.removeItem('authToken')
-      localStorage.removeItem('authUser')
-      window.location.href = '/login'
+  async error => {
+    const originalRequest = error.config as RetriableAxiosConfig | undefined
+    const status = error.response?.status
+    const url = originalRequest?.url || ''
+
+    // Don't handle 401s for auth endpoints themselves
+    if (isNoAuthEndpoint(url)) {
+      return Promise.reject(error)
     }
+
+    // Handle 401 for protected endpoints - try to refresh token
+    if (status === 401 && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      const newToken = await refreshAccessToken()
+      if (newToken) {
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${newToken}`,
+        }
+        return axiosInstance(originalRequest)
+      } else {
+        redirectToLogin()
+      }
+    }
+
     return Promise.reject(error)
   }
 )
