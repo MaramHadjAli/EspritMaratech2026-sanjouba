@@ -27,7 +27,7 @@ import { ChangePasswordPage } from '@features/profile/ChangePasswordPage'
 import NotFound from './pages/NotFound'
 import ErrorBoundary from './pages/ErrorBoundary'
 import Toast from '@components/Toast'
-import Layout from './core/layout/Layout'
+import Layout from '@core/layout/Layout'
 
 // Protected route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -55,56 +55,41 @@ const ProtectedAdminRoute: React.FC<{ children: React.ReactNode }> = ({ children
   return <>{children}</>
 }
 
-const AppRoutes = () => {
+const LandingOrRedirect = () => {
   const { isAuthenticated } = useAuth()
-
-  return (
-    <Routes>
-      {isAuthenticated ? (
-        // Authenticated routes
-        <>
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/profile/edit" element={<ProfileEditPage />} />
-          <Route path="/profile/change-password" element={<ChangePasswordPage />} />
-          
-          {/* Admin routes */}
-          <Route path="/employees/add" element={<ProtectedAdminRoute><AddEmployeePage /></ProtectedAdminRoute>} />
-          
-          {/* Visits routes */}
-          <Route path="/visits" element={<VisitsPage />} />
-          <Route path="/visits/create" element={<CreateEditVisitPage />} />
-          <Route path="/visits/:id" element={<VisitDetailPage />} />
-          <Route path="/visits/:id/edit" element={<CreateEditVisitPage />} />
-          
-          {/* Families routes */}
-          <Route path="/families" element={<FamiliesPage />} />
-          <Route path="/families/add" element={<CreateEditFamilyPage />} />
-          <Route path="/families/:id" element={<FamilyDetailPage />} />
-          <Route path="/families/:id/edit" element={<CreateEditFamilyPage />} />
-          
-          {/* Aid routes */}
-          <Route path="/aid" element={<AidPage />} />
-          <Route path="/aid/add" element={<CreateEditAidPage />} />
-          <Route path="/aid/:id" element={<AidDetailPage />} />
-          <Route path="/aid/:id/edit" element={<CreateEditAidPage />} />
-          
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </>
-      ) : (
-        // Public routes
-        <>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<LandingPage />} />
-          <Route path="*" element={<NotFound />} />
-        </>
-      )}
-    </Routes>
-  )
+  return isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />
 }
+
+const AppRoutes = () => (
+  <Routes>
+    <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+      <Route path="/home" element={<HomePage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/history" element={<HistoryPage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/profile/edit" element={<ProfileEditPage />} />
+      <Route path="/profile/change-password" element={<ChangePasswordPage />} />
+      <Route path="/visits" element={<VisitsPage />} />
+      <Route path="/visits/create" element={<CreateEditVisitPage />} />
+      <Route path="/visits/:id" element={<VisitDetailPage />} />
+      <Route path="/visits/:id/edit" element={<CreateEditVisitPage />} />
+      <Route path="/families" element={<FamiliesPage />} />
+      <Route path="/families/add" element={<CreateEditFamilyPage />} />
+      <Route path="/families/:id" element={<FamilyDetailPage />} />
+      <Route path="/families/:id/edit" element={<CreateEditFamilyPage />} />
+      <Route path="/aid" element={<AidPage />} />
+      <Route path="/aid/add" element={<CreateEditAidPage />} />
+      <Route path="/aid/:id" element={<AidDetailPage />} />
+      <Route path="/aid/:id/edit" element={<CreateEditAidPage />} />
+      <Route path="/employees/add" element={<ProtectedAdminRoute><AddEmployeePage /></ProtectedAdminRoute>} />
+    </Route>
+
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/register" element={<RegisterPage />} />
+    <Route path="/" element={<LandingOrRedirect />} />
+    <Route path="*" element={<NotFound />} />
+  </Routes>
+)
 
 function App() {
   return (

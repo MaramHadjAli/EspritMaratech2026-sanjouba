@@ -1,63 +1,19 @@
 import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import './Layout.css';
+import { Outlet } from 'react-router-dom';
+import Header from '@components/Header';
 
-export default function Layout() {
-  const [darkMode, setDarkMode] = React.useState(false);
-
-  React.useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark-mode');
-    } else {
-      document.documentElement.classList.remove('dark-mode');
-    }
-  }, [darkMode]);
-
+const Layout: React.FC = () => {
   return (
-    <div className="layout">
-      {/* Header avec accessibilité */}
-      <header className="app-header" role="banner">
-        <h1>🤝 OMNIA Charity Tracking</h1>
-        
-        <nav className="main-nav" role="navigation" aria-label="Navigation principale">
-          <ul>
-            <li>
-              <Link to="/dashboard" className="nav-link">
-                Tableau de bord
-              </Link>
-            </li>
-            <li>
-              <Link to="/families" className="nav-link">
-                Familles
-              </Link>
-            </li>
-            <li>
-              <Link to="/visits" className="nav-link">
-                Visites
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        {/* Dark mode toggle */}
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          aria-label={`Activer ${darkMode ? 'le mode' : 'le mode sombre'}`}
-          className="dark-mode-btn"
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
-      </header>
-
-      {/* Contenu principal */}
-      <main className="app-main" role="main">
-        <Outlet />
-      </main>
-
-      {/* Skip link (accessibilité) */}
-      <a href="#app-main" className="skip-link">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded" aria-label="Aller directement au contenu principal">
         Aller au contenu principal
       </a>
+      <Header />
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" role="main">
+        <Outlet />
+      </main>
     </div>
   );
-}
+};
+
+export default Layout;
