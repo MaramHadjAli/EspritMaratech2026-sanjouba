@@ -93,6 +93,7 @@
   },
   "accessibility": {
     "title": "Accessibility",
+    "subtitle": "WCAG AA Compliant",
     "highContrast": "High Contrast",
     "highContrastOn": "High contrast enabled",
     "highContrastOff": "High contrast disabled",
@@ -102,6 +103,8 @@
     "textToSpeech": "Text to Speech",
     "textToSpeechStart": "Start reading",
     "textToSpeechStop": "Stop reading",
+    "play": "Play",
+    "stop": "Stop",
     "resetSettings": "Reset settings"
   },
   "landing": {

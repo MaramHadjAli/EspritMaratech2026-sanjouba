@@ -122,6 +122,7 @@
   },
   "accessibility": {
     "title": "Accessibilité",
+    "subtitle": "Conforme WCAG AA",
     "highContrast": "Contraste élevé",
     "highContrastOn": "Contraste élevé activé",
     "highContrastOff": "Contraste élevé désactivé",
@@ -131,6 +132,8 @@
     "textToSpeech": "Lecture vocale",
     "textToSpeechStart": "Démarrer la lecture",
     "textToSpeechStop": "Arrêter la lecture",
+    "play": "Lire",
+    "stop": "Arrêter",
     "resetSettings": "Réinitialiser les paramètres",
     "skipToContent": "Passer au contenu principal",
     "openMenu": "Ouvrir le menu de navigation",

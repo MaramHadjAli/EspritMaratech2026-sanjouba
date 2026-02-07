@@ -93,6 +93,7 @@
   },
   "accessibility": {
     "title": "إمكانية الوصول",
+    "subtitle": "متوافق مع WCAG AA",
     "highContrast": "تباين عالي",
     "highContrastOn": "تم تفعيل التباين العالي",
     "highContrastOff": "تم إلغاء التباين العالي",
@@ -102,6 +103,8 @@
     "textToSpeech": "النص إلى كلام",
     "textToSpeechStart": "بدء القراءة",
     "textToSpeechStop": "إيقاف القراءة",
+    "play": "تشغيل",
+    "stop": "إيقاف",
     "resetSettings": "إعادة تعيين الإعدادات"
   },
   "landing": {
