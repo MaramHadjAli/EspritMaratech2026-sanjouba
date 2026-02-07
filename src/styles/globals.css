@@ -97,6 +97,37 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* OMNIA Background Styling */
+.omnia-bg {
+  background-image: url('/assets/Background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.omnia-bg-overlay {
+  position: relative;
+}
+
+.omnia-bg-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/Design.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.omnia-bg-overlay > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* Accessibility: Focus styles */
 *:focus-visible {
   outline: 3px solid var(--color-primary);

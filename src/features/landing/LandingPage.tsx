@@ -1,252 +1,168 @@
 /**
  * Landing Page
- * Public landing page with hero section and features
+ * Public landing page with hero section - OMNIA Style
  */
 
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@components/Button'
-import { Badge } from '@components/Badge'
-import Header from '@components/Header'
 
 const LandingPage: React.FC = () => {
   const { t } = useTranslation()
 
-  const features = [
-    {
-      icon: '👥',
-      title: 'Family Management',
-      description: 'Track and manage family information efficiently',
-    },
-    {
-      icon: '📍',
-      title: 'Visit Tracking',
-      description: 'Organize and track charitable visits with maps integration',
-    },
-    {
-      icon: '💝',
-      title: 'Aid Distribution',
-      description: 'Distribute aid transparently and track impact',
-    },
-    {
-      icon: '📊',
-      title: 'Analytics Dashboard',
-      description: 'Get insights with comprehensive statistics and charts',
-    },
-    {
-      icon: '🗺️',
-      title: 'Regional Coverage',
-      description: 'Monitor coverage across all regions',
-    },
-    {
-      icon: '🌍',
-      title: 'Multilingual',
-      description: 'Support for Arabic, French, and English',
-    },
-  ]
-
-  const stats = [
-    { number: '500+', label: 'Families Helped' },
-    { number: '1000+', label: 'Visits Completed' },
-    { number: '24', label: 'Active Regions' },
-    { number: '95%', label: 'Satisfaction Rate' },
-  ]
-
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      <Header />
+    <div
+      className="min-h-screen w-full relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(/assets/Background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* Design Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'url(/assets/Design.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
 
-      {/* Hero Section */}
-      <section className="relative px-6 py-20 sm:py-32 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <Badge variant="info" className="mb-4 inline-block">
-            ✨ Charity Management Platform
-          </Badge>
-
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl mb-6">
-            Make a Difference with OMNIA
-          </h1>
-
-          <p className="text-lg leading-8 text-gray-600 dark:text-gray-400 mb-8 max-w-xl mx-auto">
-            A comprehensive platform for managing charitable activities, tracking visits,
-            distributing aid, and monitoring impact across your organization.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register">
-              <Button size="lg">Get Started Free</Button>
-            </Link>
-            <Link to="/login">
-              <Button size="lg" variant="ghost">
-                Sign In
-              </Button>
-            </Link>
+      {/* Content Container */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="w-full py-6 px-8">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <img
+                src="/assets/omnia.jpg"
+                alt="OMNIA Logo"
+                className="w-12 h-12 rounded-full object-cover border-2 border-white/30 shadow-lg"
+              />
+              <span className="text-2xl font-bold text-white drop-shadow-lg">OMNIA</span>
+            </div>
+            <nav className="hidden md:flex items-center gap-8">
+              <Link to="#features" className="text-white/90 hover:text-white transition-colors font-medium">
+                Features
+              </Link>
+              <Link to="#about" className="text-white/90 hover:text-white transition-colors font-medium">
+                About
+              </Link>
+              <Link to="#contact" className="text-white/90 hover:text-white transition-colors font-medium">
+                Contact
+              </Link>
+            </nav>
+            <div className="flex items-center gap-4">
+              <Link to="/login">
+                <Button variant="ghost" className="text-white border-white/30 hover:bg-white/10">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button className="bg-white text-primary-600 hover:bg-white/90 shadow-lg">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
           </div>
+        </header>
 
-          {/* Hero Image Placeholder */}
-          <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-blue-500/20 rounded-3xl blur-3xl" />
-            <img
-              src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop"
-              alt="Team collaboration"
-              className="relative rounded-3xl shadow-2xl w-full"
-            />
-          </div>
-        </div>
-      </section>
+        {/* Hero Section */}
+        <main className="flex-1 flex items-center justify-center px-8">
+          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-center lg:text-left">
+              <div className="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-6 border border-white/20">
+                ✨ Charity Management Platform
+              </div>
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+                Make a Difference with{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400">
+                  OMNIA
+                </span>
+              </h1>
 
-      {/* Stats Section */}
-      <section className="py-16 px-6 lg:px-8 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, idx) => (
-              <div key={idx} className="text-center">
-                <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">
-                  {stat.number}
+              <p className="text-lg sm:text-xl text-white/80 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                A comprehensive platform for managing charitable activities, tracking visits,
+                distributing aid, and monitoring impact across your organization.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link to="/register">
+                  <Button size="lg" className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-xl px-8">
+                    Get Started Free
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button size="lg" variant="ghost" className="text-white border-2 border-white/40 hover:bg-white/10 backdrop-blur-sm px-8">
+                    Learn More
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/20">
+                <div className="text-center lg:text-left">
+                  <div className="text-3xl font-bold text-white">500+</div>
+                  <div className="text-white/70 text-sm">Families Helped</div>
                 </div>
-                <div className="text-gray-600 dark:text-gray-400 mt-2">{stat.label}</div>
+                <div className="text-center lg:text-left">
+                  <div className="text-3xl font-bold text-white">1000+</div>
+                  <div className="text-white/70 text-sm">Visits Completed</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-3xl font-bold text-white">24</div>
+                  <div className="text-white/70 text-sm">Active Regions</div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </div>
 
-      {/* Features Section */}
-      <section className="py-20 px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Powerful Features
-            </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Everything you need to manage charitable activities efficiently
-            </p>
-          </div>
+            {/* Right Content - Circular Image */}
+            <div className="flex justify-center lg:justify-end">
+              <div className="relative">
+                {/* Decorative rings */}
+                <div className="absolute inset-0 -m-4 rounded-full border-2 border-white/20 animate-pulse" />
+                <div className="absolute inset-0 -m-8 rounded-full border border-white/10" />
+                <div className="absolute inset-0 -m-12 rounded-full border border-white/5" />
+                
+                {/* Main circular image */}
+                <div className="w-72 h-72 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl backdrop-blur-sm">
+                  <img
+                    src="/assets/omnia.jpg"
+                    alt="OMNIA"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, idx) => (
-              <div
-                key={idx}
-                className="p-8 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600 transition-colors"
-              >
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
+                {/* Floating elements */}
+                <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-2xl">💝</span>
+                </div>
+                <div className="absolute -bottom-2 -left-2 w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-xl">🤝</span>
+                </div>
+                <div className="absolute top-1/2 -right-8 w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-lg">🌍</span>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-6 lg:px-8 bg-gradient-to-r from-primary-600 to-blue-600">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">Ready to make an impact?</h2>
-          <p className="text-lg text-primary-100 mb-8">
-            Join thousands of organizations using OMNIA to improve their charitable work.
-          </p>
-          <Link to="/register">
-            <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100">
-              Start Your 30-Day Free Trial
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 py-12 px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
-                <li>
-                  <Link to="#" className="hover:text-primary-500">
-                    Features
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#" className="hover:text-primary-500">
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#" className="hover:text-primary-500">
-                    Security
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
-                <li>
-                  <Link to="#" className="hover:text-primary-500">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#" className="hover:text-primary-500">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link to="#" className="hover:text-primary-500">
-                    Blog
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Legal</h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
-                <li>
-                  <Link to="/privacy" className="hover:text-primary-500">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/terms" className="hover:text-primary-500">
-                    Terms
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Connect</h3>
-              <ul className="space-y-2 text-gray-600 dark:text-gray-400 text-sm">
-                <li>
-                  <a href="#" className="hover:text-primary-500">
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary-500">
-                    LinkedIn
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-primary-500">
-                    GitHub
-                  </a>
-                </li>
-              </ul>
             </div>
           </div>
+        </main>
 
-          <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              © 2026 OMNIA. All rights reserved.
-            </p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-4 md:mt-0">
-              Made with ❤️ for charitable organizations
-            </p>
+        {/* Footer */}
+        <footer className="py-6 px-8">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-white/60 text-sm">
+            <p>© 2026 OMNIA. All rights reserved.</p>
+            <p className="mt-2 md:mt-0">Made with ❤️ for charitable organizations</p>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   )
 }
