@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@hooks/useAuth';
 import { useTheme } from '@hooks/useTheme';
 import { useLanguage } from '@hooks/useLanguage';
-const Header = () => {
+export const Header = () => {
     const { t } = useTranslation();
     const { user, logout } = useAuth();
     const { isDarkMode, toggleDarkMode } = useTheme();

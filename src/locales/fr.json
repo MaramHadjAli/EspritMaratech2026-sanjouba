@@ -95,7 +95,7 @@
     "unauthorizedAccess": "Vous n'avez pas la permission d'accéder à cette ressource",
     "registrationFailed": "L'enregistrement a échoué",
     "adminOnlyAccess": "Cette page est réservée aux administrateurs",
-    "passwordRequirements": "Le mot de passe doit contenir:",,
+    "passwordRequirements": "Le mot de passe doit contenir:",
     "atLeast8Characters": "Au moins 8 caractères",
     "oneUppercase": "Une lettre majuscule",
     "oneLowercase": "Une lettre minuscule",

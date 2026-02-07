@@ -1,70 +1,36 @@
-/**
- * Auth Service
- * Handles user authentication: login, signup, logout, and user retrieval
- */
-import { axiosInstance } from '../api/axiosInstance';
+import axios from 'axios';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-export const authService = {
-    /**
-     * Connexion utilisateur
-     */
-    login: async (credentials) => {
-        try {
-            const response = await axiosInstance.post(`${API_BASE_URL}/auth/login`, credentials);
-            // Stocker le token
-            if (response.data.token) {
-                localStorage.setItem('authToken', response.data.token);
-                if (response.data.refreshToken) {
-                    localStorage.setItem('refreshToken', response.data.refreshToken);
-                }
-            }
-            return response.data;
+
+const axiosInstance = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+axiosInstance.interceptors.request.use(
+    config => {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
-        catch (error) {
-            throw new Error('Erreur de connexion. Vérifiez vos identifiants.');
+        return config;
+    },
+    error => Promise.reject(error)
+);
+
+axiosInstance.interceptors.response.use(
+    response => response,
+    error => {
+        if ((error?.response?.status || 0) === 401) {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
+            window.location.href = '/login';
         }
-    },
-    /**
-     * Inscription utilisateur
-     */
-    signup: async (userData) => {
-        try {
-            const response = await axiosInstance.post(`${API_BASE_URL}/auth/signup`, userData);
-            if (response.data.token) {
-                localStorage.setItem('authToken', response.data.token);
-            }
-            return response.data;
-        }
-        catch (error) {
-            throw new Error('Erreur lors de l\'inscription.');
-        }
-    },
-    /**
-     * Déconnexion
-     */
-    logout: () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-    },
-    /**
-     * Récupérer l'utilisateur actif
-     */
-    getCurrentUser: () => {
-        const user = localStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
-    },
-    /**
-     * Vérifier si l'utilisateur est authentifié
-     */
-    isAuthenticated: () => {
-        return !!localStorage.getItem('authToken');
-    },
-    /**
-     * Obtenir le token
-     */
-    getToken: () => {
-        return localStorage.getItem('authToken');
-    },
-};
-//# sourceMappingURL=axiosInstance.js.map
+        return Promise.reject(error);
+    }
+);
+
+export { axiosInstance };
+export default axiosInstance;
