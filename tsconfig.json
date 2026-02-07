@@ -15,14 +15,7 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-<<<<<<< HEAD
     "noEmit": true,
-    "baseUrl": ".",
-=======
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
->>>>>>> 2119ff437f38a4c91c7a343481b1e1207a07a83a
     "paths": {
       "@/*": ["src/*"],
       "@core/*": ["src/core/*"],
