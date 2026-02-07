@@ -1,32 +1,7 @@
 /**
- * Auth Service
- * Handles user authentication: login, signup, logout, and user retrieval
+ * Axios Instance
+ * Configured HTTP client for API calls with interceptors
  */
-import { AuthResponse, LoginCredentials, User } from '../types';
-export declare const authService: {
-    /**
-     * Connexion utilisateur
-     */
-    login: (credentials: LoginCredentials) => Promise<AuthResponse>;
-    /**
-     * Inscription utilisateur
-     */
-    signup: (userData: any) => Promise<AuthResponse>;
-    /**
-     * Déconnexion
-     */
-    logout: () => void;
-    /**
-     * Récupérer l'utilisateur actif
-     */
-    getCurrentUser: () => User | null;
-    /**
-     * Vérifier si l'utilisateur est authentifié
-     */
-    isAuthenticated: () => boolean;
-    /**
-     * Obtenir le token
-     */
-    getToken: () => string | null;
-};
+declare const axiosInstance: import("axios").AxiosInstance;
+export default axiosInstance;
 //# sourceMappingURL=axiosInstance.d.ts.map

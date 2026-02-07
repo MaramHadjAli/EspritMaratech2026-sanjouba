@@ -341,17 +341,6 @@ export interface LoginCredentials {
     email: string;
     password: string;
 }
-export interface User {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    phone: string;
-    role: 'ADMIN' | 'EMPLOYEE' | 'USER';
-    location?: string;
-    avatar?: string;
-    createdAt: string;
-}
 export interface AuthResponse {
     user: User;
     token: string;

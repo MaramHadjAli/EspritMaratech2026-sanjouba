@@ -12,14 +12,13 @@ import { Button } from '@components/Button';
 import { Card } from '@components/Card';
 import { Badge } from '@components/Badge';
 import { Spinner } from '@components/Spinner';
-import { Header } from '@components/Header';
 import { visitService } from '@core/services/visit.service';
 import { dashboardService } from '@core/services/dashboard.service';
 const HomePage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
-    const toast = useNotification();
+    const { user } = useAuth();
+    const { error: showError } = useNotification();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         totalFamilies: 0,
@@ -29,7 +28,7 @@ const HomePage = () => {
     });
     const [upcomingVisits, setUpcomingVisits] = useState([]);
     useEffect(() => {
-        if (!currentUser) {
+        if (!user) {
             navigate('/login');
             return;
         }
@@ -39,25 +38,25 @@ const HomePage = () => {
                 // Fetch dashboard stats
                 const dashboardData = await dashboardService.getDashboardStats({});
                 setStats({
-                    totalFamilies: dashboardData.data.totalFamilies || 0,
-                    totalVisits: dashboardData.data.totalVisits || 0,
-                    totalAidDistributed: dashboardData.data.totalAidDistributed || 0,
-                    totalRegions: dashboardData.data.totalRegions || 0,
+                    totalFamilies: dashboardData.data?.totalFamilies || 0,
+                    totalVisits: dashboardData.data?.totalVisits || 0,
+                    totalAidDistributed: dashboardData.data?.totalAidsDistributed || 0,
+                    totalRegions: dashboardData.data?.totalRegions || 0,
                 });
                 // Fetch upcoming visits
                 const visitsData = await visitService.getUpcomingVisits();
-                setUpcomingVisits(visitsData.data.slice(0, 5) || []);
+                setUpcomingVisits(visitsData.data?.slice(0, 5) || []);
             }
             catch (error) {
                 console.error('Failed to fetch data:', error);
-                toast.error('Failed to load dashboard data');
+                showError('Failed to load dashboard data');
             }
             finally {
                 setLoading(false);
             }
         };
         fetchData();
-    }, [currentUser, navigate, toast]);
+    }, [user, navigate, showError]);
     if (loading) {
         return (_jsx("div", { className: "min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900", children: _jsx(Spinner, { size: "lg", label: t('common.loading') || 'Loading...' }) }));
     }

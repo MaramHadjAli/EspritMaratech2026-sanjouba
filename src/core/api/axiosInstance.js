@@ -1,70 +1,32 @@
 /**
- * Auth Service
- * Handles user authentication: login, signup, logout, and user retrieval
+ * Axios Instance
+ * Configured HTTP client for API calls with interceptors
  */
-import { axiosInstance } from '../api/axiosInstance';
+import axios from 'axios';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-export const authService = {
-    /**
-     * Connexion utilisateur
-     */
-    login: async (credentials) => {
-        try {
-            const response = await axiosInstance.post(`${API_BASE_URL}/auth/login`, credentials);
-            // Stocker le token
-            if (response.data.token) {
-                localStorage.setItem('authToken', response.data.token);
-                if (response.data.refreshToken) {
-                    localStorage.setItem('refreshToken', response.data.refreshToken);
-                }
-            }
-            return response.data;
-        }
-        catch (error) {
-            throw new Error('Erreur de connexion. Vérifiez vos identifiants.');
-        }
+const axiosInstance = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json',
     },
-    /**
-     * Inscription utilisateur
-     */
-    signup: async (userData) => {
-        try {
-            const response = await axiosInstance.post(`${API_BASE_URL}/auth/signup`, userData);
-            if (response.data.token) {
-                localStorage.setItem('authToken', response.data.token);
-            }
-            return response.data;
-        }
-        catch (error) {
-            throw new Error('Erreur lors de l\'inscription.');
-        }
-    },
-    /**
-     * Déconnexion
-     */
-    logout: () => {
+});
+// Add request interceptor to attach token
+axiosInstance.interceptors.request.use(config => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, error => Promise.reject(error));
+// Add response interceptor to handle errors
+axiosInstance.interceptors.response.use(response => response, error => {
+    if (error.response?.status === 401) {
+        // Clear storage and redirect to login
         localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-    },
-    /**
-     * Récupérer l'utilisateur actif
-     */
-    getCurrentUser: () => {
-        const user = localStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
-    },
-    /**
-     * Vérifier si l'utilisateur est authentifié
-     */
-    isAuthenticated: () => {
-        return !!localStorage.getItem('authToken');
-    },
-    /**
-     * Obtenir le token
-     */
-    getToken: () => {
-        return localStorage.getItem('authToken');
-    },
-};
+        localStorage.removeItem('authUser');
+        window.location.href = '/login';
+    }
+    return Promise.reject(error);
+});
+export default axiosInstance;
 //# sourceMappingURL=axiosInstance.js.map
