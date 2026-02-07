@@ -1,0 +1,388 @@
+├── .env.example
+├── .gitignore
+├── ANALYSE_CAHIER_CHARGES.md
+├── architecture.txt
+├── ARCHITECTURE_PROJET.md
+├── cahier_des_charges.pdf
+├── CHEAT_SHEET.md
+├── CHECKLIST_CONTINUES.md
+├── contenu.txt
+├── generate-structure.cjs
+├── GO_TIME.md
+├── INDEX_DOCUMENTS.md
+├── package-lock.json
+├── package.json
+├── PLAN_EXECUTION_42H.md
+├── postcss.config.js
+├── public
+│   ├── assets
+│   │   ├── icons
+│   │   └── images
+│   ├── generous.ico
+│   ├── index.html
+│   └── interceptors
+│       ├── endpoints.ts
+│       └── handlers
+│           ├── errorHandler.ts
+│           └── responseHandler.ts
+├── README.md
+├── SETUP_GUIDE.md
+├── src
+│   ├── App.d.ts
+│   ├── App.d.ts.map
+│   ├── App.js
+│   ├── App.js.map
+│   ├── App.tsx
+│   ├── core
+│   │   ├── api
+│   │   │   ├── axiosInstance.d.ts
+│   │   │   ├── axiosInstance.d.ts.map
+│   │   │   ├── axiosInstance.js
+│   │   │   ├── axiosInstance.js.map
+│   │   │   ├── axiosInstance.ts
+│   │   │   └── client.ts
+│   │   ├── config
+│   │   │   ├── constants.ts
+│   │   │   ├── environment.ts
+│   │   │   └── theme.ts
+│   │   ├── layout
+│   │   │   └── Layout.tsx
+│   │   ├── services
+│   │   │   ├── aid.service.d.ts
+│   │   │   ├── aid.service.d.ts.map
+│   │   │   ├── aid.service.js
+│   │   │   ├── aid.service.js.map
+│   │   │   ├── aid.service.ts
+│   │   │   ├── analytics.ts
+│   │   │   ├── auth.service.d.ts
+│   │   │   ├── auth.service.d.ts.map
+│   │   │   ├── auth.service.js
+│   │   │   ├── auth.service.js.map
+│   │   │   ├── auth.service.ts
+│   │   │   ├── dashboard.service.d.ts
+│   │   │   ├── dashboard.service.d.ts.map
+│   │   │   ├── dashboard.service.js
+│   │   │   ├── dashboard.service.js.map
+│   │   │   ├── dashboard.service.ts
+│   │   │   ├── family.service.d.ts
+│   │   │   ├── family.service.d.ts.map
+│   │   │   ├── family.service.js
+│   │   │   ├── family.service.js.map
+│   │   │   ├── family.service.ts
+│   │   │   ├── localization.ts
+│   │   │   ├── user.service.d.ts
+│   │   │   ├── user.service.d.ts.map
+│   │   │   ├── user.service.js
+│   │   │   ├── user.service.js.map
+│   │   │   ├── user.service.ts
+│   │   │   ├── visit.service.d.ts
+│   │   │   ├── visit.service.d.ts.map
+│   │   │   ├── visit.service.js
+│   │   │   ├── visit.service.js.map
+│   │   │   └── visit.service.ts
+│   │   ├── types.d.ts
+│   │   ├── types.d.ts.map
+│   │   ├── types.js
+│   │   ├── types.js.map
+│   │   └── types.ts
+│   ├── features
+│   │   ├── aid
+│   │   │   ├── AidDetailPage.d.ts
+│   │   │   ├── AidDetailPage.d.ts.map
+│   │   │   ├── AidDetailPage.js
+│   │   │   ├── AidDetailPage.js.map
+│   │   │   ├── AidDetailPage.tsx
+│   │   │   ├── AidPage.d.ts
+│   │   │   ├── AidPage.d.ts.map
+│   │   │   ├── AidPage.js
+│   │   │   ├── AidPage.js.map
+│   │   │   ├── AidPage.tsx
+│   │   │   ├── CreateEditAidPage.d.ts
+│   │   │   ├── CreateEditAidPage.d.ts.map
+│   │   │   ├── CreateEditAidPage.js
+│   │   │   ├── CreateEditAidPage.js.map
+│   │   │   └── CreateEditAidPage.tsx
+│   │   ├── auth
+│   │   │   ├── LoginPage.d.ts
+│   │   │   ├── LoginPage.d.ts.map
+│   │   │   ├── LoginPage.js
+│   │   │   ├── LoginPage.js.map
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── RegisterPage.d.ts
+│   │   │   ├── RegisterPage.d.ts.map
+│   │   │   ├── RegisterPage.js
+│   │   │   ├── RegisterPage.js.map
+│   │   │   └── RegisterPage.tsx
+│   │   ├── dashboard
+│   │   │   ├── DashboardPage.d.ts
+│   │   │   ├── DashboardPage.d.ts.map
+│   │   │   ├── DashboardPage.js
+│   │   │   ├── DashboardPage.js.map
+│   │   │   └── DashboardPage.tsx
+│   │   ├── families
+│   │   │   ├── CreateEditFamilyPage.d.ts
+│   │   │   ├── CreateEditFamilyPage.d.ts.map
+│   │   │   ├── CreateEditFamilyPage.js
+│   │   │   ├── CreateEditFamilyPage.js.map
+│   │   │   ├── CreateEditFamilyPage.tsx
+│   │   │   ├── FamiliesPage.d.ts
+│   │   │   ├── FamiliesPage.d.ts.map
+│   │   │   ├── FamiliesPage.js
+│   │   │   ├── FamiliesPage.js.map
+│   │   │   ├── FamiliesPage.tsx
+│   │   │   ├── FamilyDetailPage.d.ts
+│   │   │   ├── FamilyDetailPage.d.ts.map
+│   │   │   ├── FamilyDetailPage.js
+│   │   │   ├── FamilyDetailPage.js.map
+│   │   │   └── FamilyDetailPage.tsx
+│   │   ├── history
+│   │   │   ├── HistoryPage.d.ts
+│   │   │   ├── HistoryPage.d.ts.map
+│   │   │   ├── HistoryPage.js
+│   │   │   ├── HistoryPage.js.map
+│   │   │   └── HistoryPage.tsx
+│   │   ├── home
+│   │   │   ├── HomePage.d.ts
+│   │   │   ├── HomePage.d.ts.map
+│   │   │   ├── HomePage.js
+│   │   │   ├── HomePage.js.map
+│   │   │   └── HomePage.tsx
+│   │   ├── landing
+│   │   │   ├── LandingPage.d.ts
+│   │   │   ├── LandingPage.d.ts.map
+│   │   │   ├── LandingPage.js
+│   │   │   ├── LandingPage.js.map
+│   │   │   └── LandingPage.tsx
+│   │   ├── profile
+│   │   │   ├── ChangePasswordPage.d.ts
+│   │   │   ├── ChangePasswordPage.d.ts.map
+│   │   │   ├── ChangePasswordPage.js
+│   │   │   ├── ChangePasswordPage.js.map
+│   │   │   ├── ChangePasswordPage.tsx
+│   │   │   ├── ProfileEditPage.d.ts
+│   │   │   ├── ProfileEditPage.d.ts.map
+│   │   │   ├── ProfileEditPage.js
+│   │   │   ├── ProfileEditPage.js.map
+│   │   │   └── ProfileEditPage.tsx
+│   │   ├── settings
+│   │   │   ├── SettingsPage.d.ts
+│   │   │   ├── SettingsPage.d.ts.map
+│   │   │   ├── SettingsPage.js
+│   │   │   ├── SettingsPage.js.map
+│   │   │   └── SettingsPage.tsx
+│   │   └── visits
+│   │       ├── CreateEditVisitPage.d.ts
+│   │       ├── CreateEditVisitPage.d.ts.map
+│   │       ├── CreateEditVisitPage.js
+│   │       ├── CreateEditVisitPage.js.map
+│   │       ├── CreateEditVisitPage.tsx
+│   │       ├── VisitDetailPage.d.ts
+│   │       ├── VisitDetailPage.d.ts.map
+│   │       ├── VisitDetailPage.js
+│   │       ├── VisitDetailPage.js.map
+│   │       ├── VisitDetailPage.tsx
+│   │       ├── VisitsPage.d.ts
+│   │       ├── VisitsPage.d.ts.map
+│   │       ├── VisitsPage.js
+│   │       ├── VisitsPage.js.map
+│   │       └── VisitsPage.tsx
+│   ├── i18n.d.ts
+│   ├── i18n.d.ts.map
+│   ├── i18n.js
+│   ├── i18n.js.map
+│   ├── i18n.ts
+│   ├── index.tsx
+│   ├── locales
+│   │   ├── ar.json
+│   │   ├── en.json
+│   │   └── fr.json
+│   ├── main.d.ts
+│   ├── main.d.ts.map
+│   ├── main.js
+│   ├── main.js.map
+│   ├── main.tsx
+│   ├── pages
+│   │   ├── ErrorBoundary.d.ts
+│   │   ├── ErrorBoundary.d.ts.map
+│   │   ├── ErrorBoundary.js
+│   │   ├── ErrorBoundary.js.map
+│   │   ├── ErrorBoundary.tsx
+│   │   ├── NotFound.d.ts
+│   │   ├── NotFound.d.ts.map
+│   │   ├── NotFound.js
+│   │   ├── NotFound.js.map
+│   │   └── NotFound.tsx
+│   ├── shared
+│   │   ├── components
+│   │   │   ├── AccessibleButton.d.ts
+│   │   │   ├── AccessibleButton.d.ts.map
+│   │   │   ├── AccessibleButton.js
+│   │   │   ├── AccessibleButton.js.map
+│   │   │   ├── AccessibleButton.tsx
+│   │   │   ├── AccessibleFormField.d.ts
+│   │   │   ├── AccessibleFormField.d.ts.map
+│   │   │   ├── AccessibleFormField.js
+│   │   │   ├── AccessibleFormField.js.map
+│   │   │   ├── AccessibleFormField.tsx
+│   │   │   ├── AccessibleModal.d.ts
+│   │   │   ├── AccessibleModal.d.ts.map
+│   │   │   ├── AccessibleModal.js
+│   │   │   ├── AccessibleModal.js.map
+│   │   │   ├── AccessibleModal.tsx
+│   │   │   ├── Avatar.d.ts
+│   │   │   ├── Avatar.d.ts.map
+│   │   │   ├── Avatar.js
+│   │   │   ├── Avatar.js.map
+│   │   │   ├── Avatar.tsx
+│   │   │   ├── Badge.d.ts
+│   │   │   ├── Badge.d.ts.map
+│   │   │   ├── Badge.js
+│   │   │   ├── Badge.js.map
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Button.d.ts
+│   │   │   ├── Button.d.ts.map
+│   │   │   ├── Button.js
+│   │   │   ├── Button.js.map
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.d.ts
+│   │   │   ├── Card.d.ts.map
+│   │   │   ├── Card.js
+│   │   │   ├── Card.js.map
+│   │   │   ├── Card.tsx
+│   │   │   ├── CheckboxInput.d.ts
+│   │   │   ├── CheckboxInput.d.ts.map
+│   │   │   ├── CheckboxInput.js
+│   │   │   ├── CheckboxInput.js.map
+│   │   │   ├── CheckboxInput.tsx
+│   │   │   ├── DatePicker.d.ts
+│   │   │   ├── DatePicker.d.ts.map
+│   │   │   ├── DatePicker.js
+│   │   │   ├── DatePicker.js.map
+│   │   │   ├── DatePicker.tsx
+│   │   │   ├── FormField.d.ts
+│   │   │   ├── FormField.d.ts.map
+│   │   │   ├── FormField.js
+│   │   │   ├── FormField.js.map
+│   │   │   ├── FormField.tsx
+│   │   │   ├── Header.d.ts
+│   │   │   ├── Header.d.ts.map
+│   │   │   ├── Header.js
+│   │   │   ├── Header.js.map
+│   │   │   ├── Header.tsx
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.d.ts.map
+│   │   │   ├── index.js
+│   │   │   ├── index.js.map
+│   │   │   ├── index.ts
+│   │   │   ├── PasswordInput.d.ts
+│   │   │   ├── PasswordInput.d.ts.map
+│   │   │   ├── PasswordInput.js
+│   │   │   ├── PasswordInput.js.map
+│   │   │   ├── PasswordInput.tsx
+│   │   │   ├── SearchInput.d.ts
+│   │   │   ├── SearchInput.d.ts.map
+│   │   │   ├── SearchInput.js
+│   │   │   ├── SearchInput.js.map
+│   │   │   ├── SearchInput.tsx
+│   │   │   ├── SelectInput.d.ts
+│   │   │   ├── SelectInput.d.ts.map
+│   │   │   ├── SelectInput.js
+│   │   │   ├── SelectInput.js.map
+│   │   │   ├── SelectInput.tsx
+│   │   │   ├── Spinner.d.ts
+│   │   │   ├── Spinner.d.ts.map
+│   │   │   ├── Spinner.js
+│   │   │   ├── Spinner.js.map
+│   │   │   ├── Spinner.tsx
+│   │   │   ├── TextInput.d.ts
+│   │   │   ├── TextInput.d.ts.map
+│   │   │   ├── TextInput.js
+│   │   │   ├── TextInput.js.map
+│   │   │   ├── TextInput.tsx
+│   │   │   ├── Toast.d.ts
+│   │   │   ├── Toast.d.ts.map
+│   │   │   ├── Toast.js
+│   │   │   ├── Toast.js.map
+│   │   │   └── Toast.tsx
+│   │   ├── contexts
+│   │   │   ├── AuthContext.d.ts
+│   │   │   ├── AuthContext.d.ts.map
+│   │   │   ├── AuthContext.js
+│   │   │   ├── AuthContext.js.map
+│   │   │   ├── AuthContext.tsx
+│   │   │   ├── LanguageContext.d.ts
+│   │   │   ├── LanguageContext.d.ts.map
+│   │   │   ├── LanguageContext.js
+│   │   │   ├── LanguageContext.js.map
+│   │   │   ├── LanguageContext.tsx
+│   │   │   ├── NotificationContext.d.ts
+│   │   │   ├── NotificationContext.d.ts.map
+│   │   │   ├── NotificationContext.js
+│   │   │   ├── NotificationContext.js.map
+│   │   │   ├── NotificationContext.tsx
+│   │   │   ├── ThemeContext.d.ts
+│   │   │   ├── ThemeContext.d.ts.map
+│   │   │   ├── ThemeContext.js
+│   │   │   ├── ThemeContext.js.map
+│   │   │   └── ThemeContext.tsx
+│   │   ├── hooks
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.d.ts.map
+│   │   │   ├── index.js
+│   │   │   ├── index.js.map
+│   │   │   ├── index.ts
+│   │   │   ├── useAccessibility.d.ts
+│   │   │   ├── useAccessibility.d.ts.map
+│   │   │   ├── useAccessibility.js
+│   │   │   ├── useAccessibility.js.map
+│   │   │   ├── useAccessibility.ts
+│   │   │   ├── useAuth.d.ts
+│   │   │   ├── useAuth.d.ts.map
+│   │   │   ├── useAuth.js
+│   │   │   ├── useAuth.js.map
+│   │   │   ├── useAuth.ts
+│   │   │   ├── useLanguage.d.ts
+│   │   │   ├── useLanguage.d.ts.map
+│   │   │   ├── useLanguage.js
+│   │   │   ├── useLanguage.js.map
+│   │   │   ├── useLanguage.ts
+│   │   │   ├── useNotification.d.ts
+│   │   │   ├── useNotification.d.ts.map
+│   │   │   ├── useNotification.js
+│   │   │   ├── useNotification.js.map
+│   │   │   ├── useNotification.ts
+│   │   │   ├── useTheme.d.ts
+│   │   │   ├── useTheme.d.ts.map
+│   │   │   ├── useTheme.js
+│   │   │   ├── useTheme.js.map
+│   │   │   └── useTheme.ts
+│   │   ├── types
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.d.ts.map
+│   │   │   ├── index.js
+│   │   │   ├── index.js.map
+│   │   │   └── index.ts
+│   │   └── utils
+│   │       ├── accessibility.d.ts
+│   │       ├── accessibility.d.ts.map
+│   │       ├── accessibility.js
+│   │       ├── accessibility.js.map
+│   │       ├── accessibility.ts
+│   │       ├── formatters.d.ts
+│   │       ├── formatters.d.ts.map
+│   │       ├── formatters.js
+│   │       ├── formatters.js.map
+│   │       ├── formatters.ts
+│   │       ├── validators.d.ts
+│   │       ├── validators.d.ts.map
+│   │       ├── validators.js
+│   │       ├── validators.js.map
+│   │       └── validators.ts
+│   ├── styles
+│   │   └── globals.css
+│   └── vite-env.d.ts
+├── STRATEGIE_EXECUTIVE.md
+├── tailwind.config.ts
+├── tsconfig.json
+├── vite.config.ts
+└── WCAG_AA_COMPLIANCE.md

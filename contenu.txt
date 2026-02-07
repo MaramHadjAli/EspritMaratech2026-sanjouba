@@ -1,0 +1,128 @@
+
+=== PAGE 1 ===
+   
+ 
+   
+ PROJET : APPLICATION WEB  
+"OMNIA CHARITY TRACKING"  
+Événement :  Hackathon Maratech  
+ Date :  6–8 Février 2026  
+ Bénéficiaire :  Association Omnia  
+ Référent Projet :  M. Arfaoui Med Mourad, Président  
+ 
+1. CONTEXTE ET PRÉSENTATION  
+1.1. L'Association Omnia :  
+L’association Omnia, créée le 9 mars 2019 et basée à Tunis (Lafayette), est une 
+association de charité active à l’échelle nationale. Sa mission principale est d’apporter 
+une aide aux familles nécessiteuses ainsi qu’aux personnes vulnérables (personnes 
+âgées, enfants en situation de handicap, etc.).  
+ Elle compte aujourd’hui plus de 2500 bénéficiaires  suivis à travers différentes actions 
+de terrain.  
+ 
+1.2. Problématique :  
+Le principal défi rencontré par l’association est l’absence d’un système numérique 
+centralisé  permettant la collecte et le suivi structuré des données terrain.  
+Actuellement, les informations concernant :   
+• les familles visitées,  
+• leur localisation,  
+• les médicaments distribués,  
+• la nature des interventions réalisées,  
+sont dispersées, parfois incomplètes ou non mises à jour, ce qui complique :  
+• la gestion des actions de distribution,  
+• l’organisation des tournées terrain,  
+• le suivi de l’historique et de l’impact des interventions dans le temps.  
+1.3. Objectif du Projet  
+
+=== PAGE 2 ===
+   
+ 
+   
+ L’objectif est de développer une Application Web (et utilisable sur mobile)  
+permettant la collecte, la gestion et le suivi des actions caritatives de terrain . 
+ Cette plateforme permettra aux membres de l’association de :  
+• Centraliser les données des familles bénéficiaires,  
+• Collecter les données des familles directement lors des visites,  
+• Enregistrer la localisation géographique des bénéficiaires,  
+• Documenter les médicaments distribués et la nature des interventions,  
+• Centraliser l’historique des visites et des aides,  
+• Visualiser et piloter les actions terrain via des tableaux de bord et une carte interactive.  
+• Suivre l’historique des visites et des aides fournies,  
+• Visualiser les bénéficiaires sur une carte,  
+• Faciliter la planification et le pilotage des actions terrain.  
+L’application devra être accessible depuis un navigateur web , y compris sur tablette 
+ou smartphone (web responsive), afin de permettre une utilisation pratique sur le terrain.  
+2. CIBLES UTILISATEURS:  
+La solution est destinée principalement à :  
+• Les membres et bénévoles de l’association Omnia  : utilisateurs finaux 
+chargés de la saisie et du suivi des données.  
+• Usage ponctuel et événementiel  : l’outil sera principalement utilisé lors des 
+campagnes de distribution, de recensement et de visites terrain.  
+3. SPÉCIFICATIONS FONCTIONNELLES  
+Les équipes devront proposer un prototype fonctionnel  répondant aux besoins 
+suivants :  
+3.1. Fonctionnalités Cœur (MVP – Minimum Viable Product)  
+• Gestion des profils familles  
+o Création et consultation d’une fiche famille  
+o Informations administratives et sociales de base  
+• Saisie des besoins et aides  
+o Enregistrement du type d’aide apportée (colis alimentaire, 
+médicaments, aide spécifique, etc.)  
+• Historique des visites  
+o Enregistrement de la date de chaque intervention  
+o Association des aides fournies à chaque visite  
+ 
+
+=== PAGE 3 ===
+   
+ 
+   
+ 3.2. Fonctionnalités Avancées (Résultat Idéal)  
+• Géolocalisation des familles  
+o Saisie manuelle ou automatique de la position géographique (via carte)  
+• Tableau de bord de suivi  
+o Nombre de visites par famille  
+o Récapitulatif des interventions effectuées  
+o Indicateurs simples (familles les plus visitées, types d’aides les plus 
+fréquents, etc.)  
+• Cartographie interactive  
+o Visualisation des familles bénéficiaires sur une carte  
+o Aide à la planification des tournées terrain  
+ 
+4. SPÉCIFICATIONS TECHNIQUES  
+4.1. Accessibilité et Données  
+• Application Web Responsive  
+o Accessible depuis PC, tablette et smartphone via navigateur  
+o Interface simple et adaptée à un usage terrain  
+• Connexion Internet  
+o Application principalement en ligne  
+o (Optionnel / bonus) Gestion d’un mode hors -ligne partiel avec 
+synchronisation ultérieure  
+4.2. Plateforme et Technologies  
+• Type :  Application Web  
+• Architecture :  Libre choix des équipes  
+o Frontend : React, Angular, Vue.js, ou équivalent  
+o Backend : Node.js, Django, Laravel, Spring Boot, etc.  
+o Base de données : SQL ou NoSQL  
+• Intégration cartographique :  Google Maps, OpenStreetMap, Leaflet ou 
+équivalent  
+5. LIVRABLES ATTENDUS  
+À la fin des 42h du hackathon , les équipes devront fournir :  
+• Une Application Web fonctionnelle  
+• Le code source documenté , structuré et maintenable  
+• Une démonstration  illustrant un parcours utilisateur type :  
+o Ajout d’une famille  
+
+=== PAGE 4 ===
+   
+ 
+   
+ o Localisation sur la carte  
+o Saisie d’une aide  
+o Consultation de l’historique et du tableau de bord  
+ 
+6. SUIVI ET IMPACT  
+• Disponibilité métier :  
+ Le Président de l’association, M. Arfaoui Med Mourad , sera présent durant 
+l’événement afin de répondre aux questions fonctionnelles et métier des 
+équipes.  
+ 

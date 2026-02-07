@@ -1,0 +1,1 @@
+{"version":3,"file":"NotificationContext.d.ts","sourceRoot":"","sources":["NotificationContext.tsx"],"names":[],"mappings":"AAAA,OAAO,KAA2D,MAAM,OAAO,CAAA;AAC/E,OAAO,EAAgB,uBAAuB,EAAE,MAAM,QAAQ,CAAA;AAE9D,eAAO,MAAM,mBAAmB,oDAAgE,CAAA;AAEhG,eAAO,MAAM,oBAAoB,EAAE,KAAK,CAAC,EAAE,CAAC;IAAE,QAAQ,EAAE,KAAK,CAAC,SAAS,CAAA;CAAE,CAqCxE,CAAA;AAED,eAAO,MAAM,eAAe,+BAM3B,CAAA"}
