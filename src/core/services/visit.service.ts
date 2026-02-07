@@ -37,7 +37,7 @@ export const visitService = {
    * Update existing visit
    */
   updateVisit: async (id: string, data: Partial<EditVisitData>): Promise<ApiResponse<Visit>> => {
-    const response = await axiosInstance.put(`/visit/${id}`, data)
+    const response = await axiosInstance.patch(`/visit/${id}`, data)
     return response.data
   },
 
@@ -96,6 +96,32 @@ export const visitService = {
    */
   completeVisit: async (visitId: string): Promise<ApiResponse<Visit>> => {
     const response = await axiosInstance.post(`/visit/${visitId}/complete`)
+    return response.data
+  },
+
+  /**
+   * Get aid recommendations for a visit
+   */
+  getAidRecommendations: async (visitId: string): Promise<ApiResponse<any[]>> => {
+    const response = await axiosInstance.get(`/visit/${visitId}/aid-recommendation`)
+    return response.data
+  },
+
+  /**
+   * Create aid distribution during visit
+   */
+  createAidDistribution: async (
+    visitId: string,
+    data: {
+      familyId: string
+      aids: Array<{ aidId: string; quantity: number }>
+      notes?: string
+    }
+  ): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.post('/aid-distribution', {
+      ...data,
+      visitId,
+    })
     return response.data
   },
 }

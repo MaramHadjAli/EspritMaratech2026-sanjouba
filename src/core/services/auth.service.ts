@@ -102,7 +102,7 @@ export const authService = {
    * Update user profile
    */
   updateProfile: async (id: string, data: Partial<User>): Promise<ApiResponse<User>> => {
-    const response = await axiosInstance.put(`/auth/profile/${id}`, data)
+    const response = await axiosInstance.patch(`/auth/profile/${id}`, data)
     return response.data
   },
 }

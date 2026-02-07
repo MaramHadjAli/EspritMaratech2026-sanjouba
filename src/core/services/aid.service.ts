@@ -53,7 +53,7 @@ export const aidService = {
    * Update existing aid
    */
   updateAid: async (id: string, data: Partial<AddAidData>): Promise<ApiResponse<Aid>> => {
-    const response = await axiosInstance.put(`/aids/${id}`, data)
+    const response = await axiosInstance.patch(`/aids/${id}`, data)
     return response.data
   },
 
@@ -88,6 +88,26 @@ export const aidService = {
    */
   getAidsDistributionByRegion: async (): Promise<ApiResponse<any>> => {
     const response = await axiosInstance.get('/aids/distribution/by-region')
+    return response.data
+  },
+
+  /**
+   * Search aids by name or description
+   */
+  searchAids: async (query: string): Promise<ApiResponse<Aid[]>> => {
+    const response = await axiosInstance.get('/aids/search', {
+      params: { q: query },
+    })
+    return response.data
+  },
+
+  /**
+   * Find all aids with optional search filter
+   */
+  findAll: async (search?: string): Promise<ApiResponse<Aid[]>> => {
+    const response = await axiosInstance.get('/aid', {
+      params: search ? { search } : {},
+    })
     return response.data
   },
 }

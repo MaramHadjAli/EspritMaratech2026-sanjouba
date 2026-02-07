@@ -6,6 +6,7 @@ import { LanguageProvider } from '@contexts/LanguageContext'
 import { NotificationProvider } from '@contexts/NotificationContext'
 import { AccessibilityProvider } from '@contexts/AccessibilityContext'
 import { useAuth } from '@hooks/useAuth'
+import { CurrentVisitRedirect } from '@components/CurrentVisitRedirect'
 import LoginPage from '@features/auth/LoginPage'
 import RegisterPage from '@features/auth/RegisterPage'
 import AddEmployeePage from '@features/auth/AddEmployeePage'
@@ -118,7 +119,9 @@ function App() {
             <AuthProvider>
               <NotificationProvider>
                 <Router>
-                  <AppRoutes />
+                  <CurrentVisitRedirect>
+                    <AppRoutes />
+                  </CurrentVisitRedirect>
                   <Toast />
                 </Router>
               </NotificationProvider>

@@ -4,6 +4,7 @@
  */
 
 // Atoms
+export { AccessibleModal } from './AccessibleModal'
 export { Avatar, default as AvatarComponent } from './Avatar'
 export { Badge, default as BadgeComponent } from './Badge'
 export { Button, Button as ButtonComponent } from './Button'
@@ -20,3 +21,6 @@ export { DatePicker, default as DatePickerComponent } from './DatePicker'
 export { FormField, default as FormFieldComponent } from './FormField'
 export { SearchInput, default as SearchInputComponent } from './SearchInput'
 export { SelectInput, default as SelectInputComponent } from './SelectInput'
+
+// Specialized
+export { default as CurrentVisitRedirect } from './CurrentVisitRedirect'
