@@ -10,17 +10,49 @@ export const authService = {
   /**
    * Login user with email and password
    */
-  login: async (email: string, password: string): Promise<ApiResponse<{ token: string; refreshToken: string; user: User }>> => {
-    const response = await axiosInstance.post('/auth/login', { email, password })
-    return response.data
+  login: async (email: string, password: string): Promise<any> => {
+    try {
+      console.log('🔐 Attempting login with:', { email, baseURL: axiosInstance.defaults.baseURL })
+      const response = await axiosInstance.post('/auth/login', { email, password })
+      console.log('✅ Login response:', response.data)
+
+      const { token, accessToken, refreshToken, user } = response.data.data || response.data
+      const resolvedToken = token || accessToken
+
+      if (!resolvedToken || !user) {
+        throw new Error('Invalid response format: missing token or user data')
+      }
+
+      localStorage.setItem('authToken', resolvedToken)
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken)
+      }
+      localStorage.setItem('authUser', JSON.stringify(user))
+      return { token: resolvedToken, refreshToken, user }
+    } catch (error: any) {
+      console.error('❌ Login error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        code: error.code,
+        isNetworkError: !error.response,
+      })
+      throw error
+    }
   },
 
   /**
    * Register new user
    */
-  signup: async (data: SignupFormData): Promise<ApiResponse<{ token: string; refreshToken: string; user: User }>> => {
+  signup: async (data: SignupFormData): Promise<any> => {
     const response = await axiosInstance.post('/auth/signup', data)
-    return response.data
+    const { token, refreshToken, user } = response.data.data || response.data
+    localStorage.setItem('authToken', token)
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken)
+    }
+    localStorage.setItem('authUser', JSON.stringify(user))
+    return { token, refreshToken, user }
   },
 
   /**

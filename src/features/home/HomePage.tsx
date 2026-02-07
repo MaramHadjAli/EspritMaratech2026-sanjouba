@@ -12,17 +12,10 @@ import { Button } from '@components/Button'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Spinner } from '@components/Spinner'
+import Header from '@components/Header'
+import { Visit } from '@types'
 import { visitService } from '@core/services/visit.service'
 import { dashboardService } from '@core/services/dashboard.service'
-
-interface UpcomingVisit {
-  id: string
-  title: string
-  date: string
-  location: string
-  participants: number
-  status: string
-}
 
 interface DashboardStats {
   totalFamilies: number
@@ -35,7 +28,7 @@ const HomePage: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { error: showError } = useNotification()
+  const { addNotification } = useNotification()
 
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats>({
@@ -44,7 +37,7 @@ const HomePage: React.FC = () => {
     totalAidDistributed: 0,
     totalRegions: 0,
   })
-  const [upcomingVisits, setUpcomingVisits] = useState<UpcomingVisit[]>([])
+  const [upcomingVisits, setUpcomingVisits] = useState<Visit[]>([])
 
   useEffect(() => {
     if (!user) {
@@ -66,18 +59,22 @@ const HomePage: React.FC = () => {
         })
 
         // Fetch upcoming visits
-        const visitsData = await visitService.getUpcomingVisits()
+        const visitsData = await visitService.getUpcomingVisits(5)
         setUpcomingVisits(visitsData.data?.slice(0, 5) || [])
       } catch (error) {
         console.error('Failed to fetch data:', error)
-        showError('Failed to load dashboard data')
+        addNotification({
+          type: 'error',
+          message: 'Failed to load dashboard data',
+          duration: 5000,
+        })
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [user, navigate, showError])
+  }, [user, navigate, addNotification])
 
   if (loading) {
     return (
@@ -96,7 +93,7 @@ const HomePage: React.FC = () => {
           {/* Welcome Section */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Welcome back, {currentUser?.firstName}!
+              Welcome back, {user?.fullName || 'User'}!
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Here's what's happening with your charitable work today.
@@ -226,16 +223,16 @@ const HomePage: React.FC = () => {
                   >
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {visit.title}
+                        {visit.campaignName}
                       </h3>
                       <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span>📅 {visit.date}</span>
-                        <span>📍 {visit.location}</span>
-                        <span>👥 {visit.participants} participants</span>
+                        {visit.startTime && <span>📅 {new Date(visit.startTime).toLocaleDateString()}</span>}
+                        {visit.address && <span>📍 {visit.address}</span>}
+                        {visit.personCount && <span>👥 {visit.personCount} participants</span>}
                       </div>
                     </div>
                     <div className="ml-4">
-                      <Badge variant="success">{visit.status}</Badge>
+                      <Badge variant="success">{visit.status || 'ACTIVE'}</Badge>
                     </div>
                   </div>
                 ))}

@@ -3,18 +3,11 @@
  * Custom hook for accessing auth context and functions
  */
 
-import { useContext } from 'react'
-import { AuthContext } from '@contexts/AuthContext'
+import { useAuthContext } from '@contexts/AuthContext'
 import { AuthContextType } from '@types'
 
 export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext)
-
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-
-  return context
+  return useAuthContext()
 }
 
 // Additional auth-related hooks
