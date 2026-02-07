@@ -1,0 +1,41 @@
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { RefreshDto } from './dto/refresh.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ConnectedUser } from './decorators/user.decorator';
+import type { JwtPayload } from './jwt-payload.interface';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('register')
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
+
+  @Post('login')
+  login(@Body() dto: LoginDto) {
+    const idk = this.authService.login(dto);
+    console.log('Login attempt:', idk);
+    return idk;
+  }
+
+	@Post('refresh')
+	refresh(@Body() dto: RefreshDto) {
+		return this.authService.refresh(dto.refreshToken);
+	}
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  me(@ConnectedUser() user: JwtPayload) {
+    return user;
+  }
+
+  @Post('logout')
+  logout() {
+    this.authService.logout();
+  }
+}
