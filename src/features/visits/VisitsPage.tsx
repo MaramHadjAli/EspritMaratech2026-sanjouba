@@ -49,8 +49,8 @@ const VisitsPage: React.FC = () => {
   }, [user, navigate, toast])
 
   const filteredVisits = visits.filter((visit) => {
-    const matchesSearch = visit.campaignName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         visit.address?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = (visit.campaignName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (visit.address || '').toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = filterStatus === 'all' || visit.status === filterStatus
     return matchesSearch && matchesStatus
   })

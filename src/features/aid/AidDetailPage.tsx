@@ -34,9 +34,13 @@ const AidDetailPage: React.FC = () => {
         // Mock aid for now - in real app would fetch by ID
         setAid({
           id: id || '1',
-          familyId: '',
+          name: 'Sample Aid',
           type: 'FOOD',
           quantity: 100,
+          requiresRefrigeration: false,
+          createdAt: new Date().toISOString(),
+          // UI-only fields
+          familyId: '',
           unit: 'kg',
           description: 'Sample aid',
           addedAt: new Date().toISOString(),

@@ -18,18 +18,14 @@ export type UserRoleString = 'GUEST' | 'USER' | 'EMPLOYEE' | 'ADMIN'
 
 export interface User {
   id: string
+  name: string
   email: string
-  fullName: string
-  name?: string
-  phoneNumber?: string
-  secondaryPhone?: string
-  dateOfBirth?: string
-  location?: string
-  region?: string
   role: UserRole | UserRoleString
-  profilePicture?: string
+  phone?: string | null
+  isEmailValidated: boolean
+  currentVisit?: Pick<Visit, 'id'> | null
   createdAt: string
-  updatedAt: string
+  deletedAt?: string | null
 }
 
 export interface AuthContextType {
@@ -99,17 +95,27 @@ export enum FamilyStatus {
 }
 
 export interface Family {
+  // Exposed fields
   id: string
-  visitId?: string
-  name: string
-  headOfFamily: string
+  lastName: string
+  phone?: string | null
+  address?: string | null
+  numberOfMembers: number
+  containsDisabledMember: boolean
+  containsElderlyMember: boolean
+  containspupilMember: boolean
+  notes?: string | null
+  vulnerabilityScore: number
+  createdAt: string
+  deletedAt?: string | null
+  // UI-only fields (not exposed by backend)
+  headOfFamily?: string
+  name?: string
+  familySize?: number
   phoneNumber?: string
   secondaryPhone?: string
-  numberOfMembers: number
-  address?: string
   latitude?: number
   longitude?: number
-  familySize: number
   socioeconomicStatus?: SocioeconomicStatus
   photoType?: 'STUDENT' | 'UNIVERSITY_STUDENT' | 'ELDERLY' | 'SICK'
   photos?: {
@@ -117,9 +123,7 @@ export interface Family {
     url: string
   }[]
   status?: FamilyStatus | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-  notes?: string
-  createdAt: string
-  updatedAt: string
+  updatedAt?: string
 }
 
 export interface AddFamilyData {
@@ -166,29 +170,40 @@ export interface Campaign {
 }
 
 export interface Visit {
+  // Exposed fields
   id: string
+  startDate: Date | string
+  endDate?: Date | string | null
+  latitude?: number | null
+  longitude?: number | null
+  city?: string | null
+  region?: string | null
+  isActive: boolean
+  isCompleted: boolean
+  statsComputed: boolean
+  notes?: string | null
+  users?: Array<Pick<User, 'id' | 'name' | 'email'>>
+  // UI-only fields (not exposed by backend but used for display)
+  campaignName?: string
   campaignId?: string
-  campaignName: string
   campaignType?: CampaignType
   description?: string
   familiesCount?: number
   personCount?: number
   couldNotBeReachedCount?: number
-  notes?: string
-  photos?: string[]
   startTime?: string
   endTime?: string
   location?: {
     latitude: number
     longitude: number
   }
+  status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
   address?: string
   createdBy?: string
   members?: string[]
-  status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
-  cityName?: string
   familyId?: string
   employeeId?: string
+  photos?: string[]
 }
 
 export interface CreateVisitData {
@@ -226,15 +241,25 @@ export enum AidType {
 }
 
 export interface Aid {
+  // Exposed fields
   id: string
-  familyId: string
-  visitId?: string
+  name: string
   type: AidType | string
+  description?: string | null
   quantity: number
-  unit: string
+  requiredMinTemperatureC?: number | null
+  requiredMaxTemperatureC?: number | null
+  requiredHumidityLevel?: string | null
+  requiresRefrigeration: boolean
+  deposit?: Pick<Deposit, 'id' | 'name' | 'city'> | null
+  createdAt: string
+  deletedAt?: string | null
+  // UI-only fields (not exposed by backend)
+  familyId?: string
+  visitId?: string
+  unit?: string
   weight?: number
-  description?: string
-  addedAt: string
+  addedAt?: string
 }
 
 export interface Medicine {
@@ -365,6 +390,61 @@ export interface OfflineContextType {
   addToQueue: (item: OfflineQueueItem) => void
   sync: () => Promise<void>
   clearQueue: () => void
+}
+
+// ============================================
+// DEPOSIT TYPES
+// ============================================
+
+export interface Deposit {
+  id: string
+  name: string
+  description?: string | null
+  address?: string | null
+  city?: string | null
+  region?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  capacity: number
+  currentQuantity: number
+  minTemperatureC?: number | null
+  maxTemperatureC?: number | null
+  humidityLevel: string
+  isRefrigerated: boolean
+  containerImageUrl?: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+// ============================================
+// LOCATION TYPES
+// ============================================
+
+export interface Location {
+  id: string
+  latitude: number
+  longitude: number
+  city?: string | null
+  region?: string | null
+  description?: string | null
+  createdAt: string
+  deletedAt?: string | null
+}
+
+// ============================================
+// AID DISTRIBUTION TYPES
+// ============================================
+
+export interface AidDistribution {
+  id: string
+  quantity: number
+  unit?: string | null
+  notes?: string | null
+  visit: Visit
+  aid: Aid
+  sourceDeposit?: Pick<Deposit, 'id' | 'name' | 'city' | 'region'> | null
+  createdAt: string
+  deletedAt?: string | null
 }
 
 // API Response Types

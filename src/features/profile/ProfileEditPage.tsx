@@ -45,17 +45,16 @@ export const ProfileEditPage: React.FC = () => {
           id: user.id,
           name: 'Mohamed Ahmed',
           email: user.email,
-          phoneNumber: '+20 123 456 7890',
-          fullName: 'Mohamed Ahmed',
+          phone: '+20 123 456 7890',
           role: user.role,
+          isEmailValidated: true,
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         }
         setUserData(mockUser)
         reset({
-          name: mockUser.name || mockUser.fullName,
+          name: mockUser.name,
           email: mockUser.email,
-          phoneNumber: mockUser.phoneNumber,
+          phoneNumber: mockUser.phone || '',
         })
       } catch (err) {
         toast.error('Error loading profile')

@@ -34,6 +34,14 @@ const VisitDetailPage: React.FC = () => {
         // Mock visit for now - in real app would fetch by ID
         const mockVisit: Visit = {
           id: id || '1',
+          startDate: new Date().toISOString(),
+          endDate: new Date(Date.now() + 86400000).toISOString(),
+          city: 'Sample City',
+          region: 'Sample Region',
+          isActive: true,
+          isCompleted: false,
+          statsComputed: false,
+          // UI-only fields
           campaignName: 'Sample Campaign',
           address: 'Sample Address',
           description: 'Sample description',

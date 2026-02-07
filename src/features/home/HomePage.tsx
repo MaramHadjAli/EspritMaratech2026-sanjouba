@@ -50,18 +50,32 @@ const HomePage: React.FC = () => {
       try {
         setLoading(true)
         
-        // Fetch upcoming visits
-        const visitsData = await visitService.getUpcomingVisits()
-        const mappedVisits: Visit[] = (visitsData.data?.slice(0, 5) || []).map(visit => ({
+        // Fetch upcoming visits from /event/upcoming
+        const visitsData = await visitService.getUpcomingVisits(5)
+        const visits = Array.isArray(visitsData) ? visitsData : (visitsData.data || [])
+        
+        const mappedVisits: Visit[] = visits.slice(0, 5).map((visit: any) => ({
           id: visit.id || '',
-          campaignName: visit.campaignName || 'Visit',
-          startTime: visit.startTime || new Date().toISOString(),
-          address: visit.address || 'N/A',
-          personCount: visit.members?.length || visit.personCount || 0,
-          status: visit.status || 'ACTIVE',
-          cityName: visit.cityName || '',
-          familyId: visit.familyId || '',
-          employeeId: visit.employeeId || ''
+          startDate: visit.startDate || new Date().toISOString(),
+          endDate: visit.endDate,
+          latitude: visit.latitude,
+          longitude: visit.longitude,
+          city: visit.city || '',
+          region: visit.region || '',
+          isActive: visit.isActive ?? true,
+          isCompleted: visit.isCompleted ?? false,
+          statsComputed: visit.statsComputed ?? false,
+          notes: visit.notes,
+          users: visit.users || [],
+          // UI-only fields
+          campaignName: `Visit to ${visit.city || 'Unknown'}`,
+          address: `${visit.city || ''}, ${visit.region || ''}`.trim().replace(/^,\s*/, ''),
+          location: visit.latitude && visit.longitude ? {
+            latitude: visit.latitude,
+            longitude: visit.longitude
+          } : undefined,
+          personCount: visit.users?.length || 0,
+          status: visit.isCompleted ? 'COMPLETED' : (visit.isActive ? 'ACTIVE' : 'CANCELLED'),
         }))
         setUpcomingVisits(mappedVisits)
       } catch (error) {
@@ -88,7 +102,7 @@ const HomePage: React.FC = () => {
           {/* Welcome Section */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Welcome back, {user?.fullName || user?.name || 'User'}!
+              Welcome back, {user?.name || 'User'}!
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Here's what's happening with your charitable work today.
@@ -221,9 +235,12 @@ const HomePage: React.FC = () => {
                         {visit.campaignName}
                       </h3>
                       <div className="flex items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        {visit.startTime && <span>📅 {new Date(visit.startTime).toLocaleDateString()}</span>}
+                        {visit.startDate && (
+                          <span>📅 {new Date(visit.startDate).toLocaleDateString()} at {new Date(visit.startDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        )}
                         {visit.address && <span>📍 {visit.address}</span>}
-                        {visit.personCount && <span>👥 {visit.personCount} participants</span>}
+                        {(visit.personCount ?? 0) > 0 && <span>👥 {visit.personCount} team member{(visit.personCount ?? 1) !== 1 ? 's' : ''}</span>}
+                        {visit.notes && <span className="text-xs italic">✏️ {visit.notes}</span>}
                       </div>
                     </div>
                     <div className="ml-4">

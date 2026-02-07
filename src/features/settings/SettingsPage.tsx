@@ -199,7 +199,7 @@ const SettingsPage: React.FC = () => {
                       </h3>
                       <div className="space-y-2">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Name: {user.fullName || user.name || 'N/A'}
+                          Name: {user.name || 'N/A'}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Email: {user.email}

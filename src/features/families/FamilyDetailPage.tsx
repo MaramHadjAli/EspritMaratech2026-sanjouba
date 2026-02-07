@@ -34,13 +34,19 @@ const FamilyDetailPage: React.FC = () => {
         // Mock family for now - in real app would fetch by ID
         const mockFamily: Family = {
           id: id || '1',
+          lastName: 'Sample Family',
+          numberOfMembers: 4,
+          containsDisabledMember: false,
+          containsElderlyMember: false,
+          containspupilMember: true,
+          vulnerabilityScore: 5,
+          createdAt: new Date().toISOString(),
+          // UI-only fields
           headOfFamily: 'Sample Family',
           familySize: 5,
-          numberOfMembers: 4,
           phoneNumber: '+216 99 999 999',
           address: 'Sample Address',
           name: 'Sample Family',
-          createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
         setFamily(mockFamily)
