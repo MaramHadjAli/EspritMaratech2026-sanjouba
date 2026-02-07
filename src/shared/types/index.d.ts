@@ -13,8 +13,7 @@ export interface User {
     id: string;
     email: string;
     fullName: string;
-    firstName?: string;
-    lastName?: string;
+    name?: string;
     phoneNumber?: string;
     secondaryPhone?: string;
     dateOfBirth?: string;
@@ -40,8 +39,7 @@ export interface SignupFormData {
     password: string;
     confirmPassword: string;
     fullName: string;
-    firstName: string;
-    lastName: string;
+    name: string;
     phoneNumber: string;
     dateOfBirth: string;
     location: string;
@@ -52,8 +50,7 @@ export interface LoginFormData {
     rememberMe?: boolean;
 }
 export interface UpdateUserData {
-    firstName: string;
-    lastName: string;
+    name: string;
     email: string;
     phoneNumber: string;
     organization?: string;
@@ -82,8 +79,7 @@ export declare enum FamilyStatus {
 export interface Family {
     id: string;
     visitId?: string;
-    firstName: string;
-    lastName: string;
+    name: string;
     headOfFamily: string;
     phoneNumber?: string;
     secondaryPhone?: string;
@@ -104,8 +100,7 @@ export interface Family {
     updatedAt: string;
 }
 export interface AddFamilyData {
-    firstName: string;
-    lastName: string;
+    name: string;
     address: string;
     phoneNumber: string;
     secondaryPhone?: string;

@@ -87,7 +87,9 @@ const LoginPage: React.FC = () => {
       }
 
       try {
-        await login(formData.email, formData.password)
+        console.log('🔐 Submitting login form with data:', { email: formData.email })
+        const response = await login(formData.email, formData.password)
+        console.log('✅ Login successful, response:', response)
         if (formData.rememberMe) {
           localStorage.setItem('rememberEmail', formData.email)
         } else {
@@ -95,8 +97,13 @@ const LoginPage: React.FC = () => {
         }
         navigate('/home')
       } catch (error: any) {
+        console.error('❌ Login error caught:', error)
         const errorMessage =
-          error?.response?.data?.message || error?.message || t('auth.invalidCredentials')
+          error?.response?.data?.message || 
+          error?.message || 
+          error?.toString() ||
+          t('auth.invalidCredentials')
+        console.error('Error message to display:', errorMessage)
         setSubmitError(errorMessage)
       }
     },

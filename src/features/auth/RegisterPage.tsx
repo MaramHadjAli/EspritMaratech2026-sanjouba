@@ -8,7 +8,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useToast } from '@hooks/useNotification'
-import { validateSignupForm } from '@utils/validators'
+import { validateSignupForm, validatePhoneTN } from '@utils/validators'
 import { Button } from '@components/Button'
 import { TextInput } from '@components/TextInput'
 import { PasswordInput } from '@components/PasswordInput'
@@ -24,8 +24,7 @@ const RegisterPage: React.FC = () => {
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phoneNumber: '',
     password: '',
@@ -53,11 +52,8 @@ const RegisterPage: React.FC = () => {
 
     switch (stepNum) {
       case 1:
-        if (!formData.firstName.trim()) {
-          newErrors.firstName = 'First name is required'
-        }
-        if (!formData.lastName.trim()) {
-          newErrors.lastName = 'Last name is required'
+        if (!formData.name.trim()) {
+          newErrors.name = 'Name is required'
         }
         break
       case 2:
@@ -67,7 +63,9 @@ const RegisterPage: React.FC = () => {
           newErrors.email = 'Invalid email format'
         }
         if (!formData.phoneNumber) {
-          newErrors.phoneNumber = 'Phone is required'
+          newErrors.phoneNumber = t('validation.phoneRequired')
+        } else if (!validatePhoneTN(formData.phoneNumber)) {
+          newErrors.phoneNumber = t('validation.invalidPhoneFormat')
         }
         break
       case 3:
@@ -108,9 +106,8 @@ const RegisterPage: React.FC = () => {
 
     try {
       await signup({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        fullName: `${formData.firstName} ${formData.lastName}`,
+        name: formData.name,
+        fullName: formData.name,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         password: formData.password,
@@ -173,22 +170,15 @@ const RegisterPage: React.FC = () => {
           {/* Step 1: Personal Info */}
           {step === 1 && (
             <>
-              <FormField label="First Name" error={errors.firstName} required>
+              <FormField label="Full Name" error={errors.name} required>
                 <TextInput
-                  name="firstName"
-                  value={formData.firstName}
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
-                  placeholder="John"
+                  placeholder="Mohamed Ahmed"
                 />
               </FormField>
-              <FormField label="Last Name" error={errors.lastName} required>
-                <TextInput
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Doe"
-                />
-              </FormField>
+
             </>
           )}
 

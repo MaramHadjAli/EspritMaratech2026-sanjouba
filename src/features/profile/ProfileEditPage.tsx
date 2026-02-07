@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '@hooks/useAuth'
 import { useToast } from '@hooks/useNotification'
-import Header from '@components/Header'
 import { FormField } from '@components/FormField'
 import { Button } from '@components/Button'
 import { Card } from '@components/Card'
@@ -23,8 +22,7 @@ export const ProfileEditPage: React.FC = () => {
     reset,
   } = useForm<UpdateUserData>({
     defaultValues: {
-      firstName: '',
-      lastName: '',
+      name: '',
       email: '',
       phoneNumber: '',
       organization: '',
@@ -45,8 +43,7 @@ export const ProfileEditPage: React.FC = () => {
         // Mock user data - in real app would fetch from backend
         const mockUser: User = {
           id: user.id,
-          firstName: 'Mohamed',
-          lastName: 'Ahmed',
+          name: 'Mohamed Ahmed',
           email: user.email,
           phoneNumber: '+20 123 456 7890',
           fullName: 'Mohamed Ahmed',
@@ -56,8 +53,7 @@ export const ProfileEditPage: React.FC = () => {
         }
         setUserData(mockUser)
         reset({
-          firstName: mockUser.firstName,
-          lastName: mockUser.lastName,
+          name: mockUser.name || mockUser.fullName,
           email: mockUser.email,
           phoneNumber: mockUser.phoneNumber,
         })
@@ -93,23 +89,18 @@ export const ProfileEditPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header />
-        <main className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-96">
-            <div className="text-gray-600 dark:text-gray-400">
-              Loading profile...
-            </div>
+      <div className="py-8">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-gray-600 dark:text-gray-400">
+            Loading profile...
           </div>
-        </main>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      <main className="max-w-4xl mx-auto px-4 py-8">
+    <div className="py-8 max-w-4xl mx-auto">
         <div>
           <div className="mb-8">
             <button
@@ -131,39 +122,21 @@ export const ProfileEditPage: React.FC = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Name Section */}
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-1 gap-6">
                 <FormField
-                  label="First Name"
-                  error={errors.firstName?.message}
+                  label="Full Name"
+                  error={errors.name?.message}
                 >
                   <input
-                    {...register('firstName', {
-                      required: 'First name is required',
+                    {...register('name', {
+                      required: 'Full name is required',
                       minLength: {
                         value: 2,
-                        message: 'First name must be at least 2 characters',
+                        message: 'Name must be at least 2 characters',
                       },
                     })}
                     type="text"
-                    placeholder="Enter first name"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                  />
-                </FormField>
-
-                <FormField
-                  label="Last Name"
-                  error={errors.lastName?.message}
-                >
-                  <input
-                    {...register('lastName', {
-                      required: 'Last name is required',
-                      minLength: {
-                        value: 2,
-                        message: 'Last name must be at least 2 characters',
-                      },
-                    })}
-                    type="text"
-                    placeholder="Enter last name"
+                    placeholder="Enter your full name"
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
                   />
                 </FormField>
@@ -279,7 +252,6 @@ export const ProfileEditPage: React.FC = () => {
             </Button>
           </div>
         </div>
-      </main>
     </div>
   )
 }

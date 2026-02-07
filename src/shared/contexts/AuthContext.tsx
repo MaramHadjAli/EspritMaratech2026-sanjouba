@@ -1,7 +1,16 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { User, AuthContextType, SignupFormData } from '@types'
+import { authService } from '@services/auth.service'
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export const useAuthContext = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuthContext must be used within an AuthProvider')
+  }
+  return context
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
@@ -15,34 +24,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedToken && storedUser) {
       setToken(storedToken)
       setUser(JSON.parse(storedUser))
+      console.log('🔐 [AuthContext] Restored from localStorage')
     }
   }, [])
 
+  // Log when user state changes
+  useEffect(() => {
+    console.log('🔐 [AuthContext] User state changed:', { 
+      hasUser: !!user, 
+      user,
+      isAuthenticated: !!token && !!user 
+    })
+  }, [user, token])
+
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true)
+    console.log('🔐 [AuthContext] Starting login...')
     try {
-      // TODO: Call API endpoint POST /auth/login
-      // const response = await apiClient.post('/auth/login', { email, password })
-      // const { token, user } = response.data
+      const response = await authService.login(email, password)
+      console.log('🔐 [AuthContext] Login response received:', { 
+        hasToken: !!response.token, 
+        hasUser: !!response.user,
+        user: response.user 
+      })
       
-      // Placeholder for testing
-      const mockUser: User = {
-        id: '1',
-        email,
-        fullName: 'Test User',
-        phoneNumber: '+216 XX XXX XXX',
-        role: 'USER',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      const mockToken = 'mock-jwt-token-' + Date.now()
-
-      localStorage.setItem('authToken', mockToken)
-      localStorage.setItem('authUser', JSON.stringify(mockUser))
-      setToken(mockToken)
-      setUser(mockUser)
+      setToken(response.token)
+      setUser(response.user)
+      
+      console.log('🔐 [AuthContext] State updated - isAuthenticated should be true now')
+      return response
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error('❌ [AuthContext] Login failed:', error)
       throw error
     } finally {
       setIsLoading(false)
@@ -52,25 +64,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = useCallback(async (data: SignupFormData) => {
     setIsLoading(true)
     try {
-      // TODO: Call API endpoint POST /auth/signup
-      // const response = await apiClient.post('/auth/signup', data)
-      // const { token, user } = response.data
-      
-      const mockUser: User = {
-        id: '1',
-        email: data.email,
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
-        role: 'USER',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      const mockToken = 'mock-jwt-token-' + Date.now()
-
-      localStorage.setItem('authToken', mockToken)
-      localStorage.setItem('authUser', JSON.stringify(mockUser))
-      setToken(mockToken)
-      setUser(mockUser)
+      const response = await authService.signup(data)
+      setToken(response.token)
+      setUser(response.user)
+      return response
     } catch (error) {
       console.error('Signup failed:', error)
       throw error

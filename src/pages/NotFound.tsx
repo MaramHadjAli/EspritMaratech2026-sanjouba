@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@components/Button'
 import { Card } from '@components/Card'
-import Header from '@components/Header'
 import { useAuth } from '@hooks/useAuth'
 
 const NotFound: React.FC = () => {
@@ -24,8 +23,6 @@ const NotFound: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      {isAuthenticated && <Header />}
-      
       <div className="flex items-center justify-center px-4 py-12 min-h-screen">
         <Card bordered className="w-full max-w-md p-8">
           {/* 404 Icon */}

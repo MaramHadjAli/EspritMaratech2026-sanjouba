@@ -46,7 +46,7 @@ const FamiliesPage = () => {
     }, [user, navigate, toast]);
     const filteredFamilies = families.filter((family) => {
         const matchesSearch = family.headOfFamily?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            family.firstName?.toLowerCase().includes(searchTerm.toLowerCase());
+            family.name?.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesSearch;
     });
     if (loading) {

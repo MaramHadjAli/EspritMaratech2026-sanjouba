@@ -26,6 +26,7 @@ import { ChangePasswordPage } from '@features/profile/ChangePasswordPage';
 import NotFound from './pages/NotFound';
 import ErrorBoundary from './pages/ErrorBoundary';
 import Toast from '@components/Toast';
+import Layout from '@core/layout/Layout';
 // Protected route wrapper
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated } = useAuth();
@@ -53,6 +54,7 @@ const AppRoutes = () => {
         // Public routes
         _jsxs(_Fragment, { children: [_jsx(Route, { path: "/login", element: _jsx(LoginPage, {}) }), _jsx(Route, { path: "/", element: _jsx(LandingPage, {}) }), _jsx(Route, { path: "*", element: _jsx(NotFound, {}) })] })) }));
 };
+const AppRoutes = () => (_jsxs(Routes, { children: [_jsxs(Route, { element: _jsx(ProtectedRoute, { children: _jsx(Layout, {}) }), children: [_jsx(Route, { path: "/home", element: _jsx(HomePage, {}) }), _jsx(Route, { path: "/dashboard", element: _jsx(DashboardPage, {}) }), _jsx(Route, { path: "/history", element: _jsx(HistoryPage, {}) }), _jsx(Route, { path: "/settings", element: _jsx(SettingsPage, {}) }), _jsx(Route, { path: "/profile/edit", element: _jsx(ProfileEditPage, {}) }), _jsx(Route, { path: "/profile/change-password", element: _jsx(ChangePasswordPage, {}) }), _jsx(Route, { path: "/visits", element: _jsx(VisitsPage, {}) }), _jsx(Route, { path: "/visits/create", element: _jsx(CreateEditVisitPage, {}) }), _jsx(Route, { path: "/visits/:id", element: _jsx(VisitDetailPage, {}) }), _jsx(Route, { path: "/visits/:id/edit", element: _jsx(CreateEditVisitPage, {}) }), _jsx(Route, { path: "/families", element: _jsx(FamiliesPage, {}) }), _jsx(Route, { path: "/families/add", element: _jsx(CreateEditFamilyPage, {}) }), _jsx(Route, { path: "/families/:id", element: _jsx(FamilyDetailPage, {}) }), _jsx(Route, { path: "/families/:id/edit", element: _jsx(CreateEditFamilyPage, {}) }), _jsx(Route, { path: "/aid", element: _jsx(AidPage, {}) }), _jsx(Route, { path: "/aid/add", element: _jsx(CreateEditAidPage, {}) }), _jsx(Route, { path: "/aid/:id", element: _jsx(AidDetailPage, {}) }), _jsx(Route, { path: "/aid/:id/edit", element: _jsx(CreateEditAidPage, {}) }), _jsx(Route, { path: "/employees/add", element: _jsx(ProtectedAdminRoute, { children: _jsx(AddEmployeePage, {}) }) })] }), _jsx(Route, { path: "/login", element: _jsx(LoginPage, {}) }), _jsx(Route, { path: "/register", element: _jsx(RegisterPage, {}) }), _jsx(Route, { path: "/", element: _jsx(LandingOrRedirect, {}) }), _jsx(Route, { path: "*", element: _jsx(NotFound, {}) })] }));
 function App() {
     return (_jsx(ErrorBoundary, { children: _jsx(ThemeProvider, { children: _jsx(LanguageProvider, { children: _jsx(AuthProvider, { children: _jsx(NotificationProvider, { children: _jsxs(Router, { children: [_jsx(AppRoutes, {}), _jsx(Toast, {})] }) }) }) }) }) }));
 }

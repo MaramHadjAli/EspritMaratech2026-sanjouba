@@ -164,19 +164,12 @@ export const validateSignupForm = (data) => {
     else if (!validateEmail(data.email)) {
         errors.push({ field: 'email', message: 'Invalid email format' });
     }
-    // First Name
-    if (!data.firstName) {
-        errors.push({ field: 'firstName', message: 'First name is required' });
+    // Name
+    if (!data.name) {
+        errors.push({ field: 'name', message: 'Name is required' });
     }
-    else if (!validateName(data.firstName)) {
-        errors.push({ field: 'firstName', message: 'Invalid name format' });
-    }
-    // Last Name
-    if (!data.lastName) {
-        errors.push({ field: 'lastName', message: 'Last name is required' });
-    }
-    else if (!validateName(data.lastName)) {
-        errors.push({ field: 'lastName', message: 'Invalid name format' });
+    else if (!validateName(data.name)) {
+        errors.push({ field: 'name', message: 'Invalid name format' });
     }
     // Phone
     if (!data.phoneNumber) {

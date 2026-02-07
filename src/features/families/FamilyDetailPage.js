@@ -35,8 +35,7 @@ const FamilyDetailPage = () => {
                     numberOfMembers: 4,
                     phoneNumber: '+216 99 999 999',
                     address: 'Sample Address',
-                    firstName: 'Sample',
-                    lastName: 'Family',
+                    name: 'Sample Family',
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 };

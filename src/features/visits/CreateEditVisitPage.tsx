@@ -12,7 +12,6 @@ import { visitService } from '@services/visit.service'
 import { Card } from '@components/Card'
 import { FormField } from '@components/FormField'
 import { Button } from '@components/Button'
-import Header from '@components/Header'
 import type { CreateVisitData } from '@/shared/types'
 
 const CreateEditVisitPage: React.FC = () => {
@@ -72,11 +71,7 @@ const CreateEditVisitPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto">
+    <div className="py-8 max-w-2xl mx-auto">
           {/* Navigation */}
           <button
             onClick={() => navigate(isEditing ? `/visits/${id}` : '/visits')}
@@ -167,8 +162,6 @@ const CreateEditVisitPage: React.FC = () => {
               </div>
             </form>
           </Card>
-        </div>
-      </div>
     </div>
   )
 }

@@ -11,10 +11,44 @@ export const dashboardService = {
    * Get dashboard statistics/KPIs
    */
   getDashboardStats: async (filters?: Record<string, any>): Promise<ApiResponse<DashboardStats>> => {
-    const response = await axiosInstance.get('/dashboard/stats', {
-      params: filters,
-    })
-    return response.data
+    const extractData = (payload: any) => payload?.data ?? payload
+    const toArray = (value: any) => (Array.isArray(value) ? value : [])
+    const getNumberFrom = (item: any, keys: string[]) => {
+      for (const key of keys) {
+        const value = item?.[key]
+        if (typeof value === 'number') {
+          return value
+        }
+      }
+      return 0
+    }
+    const sumBy = (items: any[], keys: string[]) =>
+      items.reduce((sum, item) => sum + getNumberFrom(item, keys), 0)
+
+    const [familiesResponse, visitsResponse, aidsResponse] = await Promise.all([
+      axiosInstance.get('/dashboard/cities/families', { params: filters }),
+      axiosInstance.get('/dashboard/cities/visits', { params: filters }),
+      axiosInstance.get('/dashboard/aids/pie', { params: { limit: 100, ...filters } }),
+    ])
+
+    const familiesData = toArray(extractData(familiesResponse.data))
+    const visitsData = toArray(extractData(visitsResponse.data))
+    const aidsData = toArray(extractData(aidsResponse.data))
+
+    const totalFamilies = sumBy(familiesData, ['families', 'familiesCount', 'count', 'value', 'total'])
+    const totalVisits = sumBy(visitsData, ['visits', 'visitsCount', 'count', 'value', 'total'])
+    const totalAidsDistributed = sumBy(aidsData, ['value', 'amount', 'total', 'count'])
+    const totalRegions = familiesData.length
+
+    return {
+      success: true,
+      data: {
+        totalFamilies,
+        totalVisits,
+        totalAidsDistributed,
+        totalRegions,
+      },
+    }
   },
 
   /**

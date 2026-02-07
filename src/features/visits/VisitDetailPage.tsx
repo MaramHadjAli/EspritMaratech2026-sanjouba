@@ -12,7 +12,6 @@ import { Spinner } from '@components/Spinner'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Button } from '@components/Button'
-import Header from '@components/Header'
 import type { Visit } from '@/shared/types'
 
 const VisitDetailPage: React.FC = () => {
@@ -69,21 +68,19 @@ const VisitDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header />
+      <>
         <div className="py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <Spinner />
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (!visit) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header />
+      <>
         <div className="py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <Card bordered className="p-8 text-center">
@@ -96,13 +93,12 @@ const VisitDetailPage: React.FC = () => {
             </Card>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
+    <>
 
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -282,7 +278,7 @@ const VisitDetailPage: React.FC = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

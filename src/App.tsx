@@ -4,6 +4,7 @@ import { AuthProvider } from '@contexts/AuthContext'
 import { ThemeProvider } from '@contexts/ThemeContext'
 import { LanguageProvider } from '@contexts/LanguageContext'
 import { NotificationProvider } from '@contexts/NotificationContext'
+import { AccessibilityProvider } from '@contexts/AccessibilityContext'
 import { useAuth } from '@hooks/useAuth'
 import LoginPage from '@features/auth/LoginPage'
 import RegisterPage from '@features/auth/RegisterPage'
@@ -61,8 +62,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       {isAuthenticated ? (
-        // Authenticated routes
-        <>
+        // Authenticated routes - wrapped in Layout
+        <Route element={<Layout />}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/history" element={<HistoryPage />} />
@@ -93,7 +94,7 @@ const AppRoutes = () => {
           
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="*" element={<NotFound />} />
-        </>
+        </Route>
       ) : (
         // Public routes
         <>
@@ -111,14 +112,16 @@ function App() {
     <ErrorBoundary>
       <ThemeProvider>
         <LanguageProvider>
-          <AuthProvider>
-            <NotificationProvider>
-              <Router>
-                <AppRoutes />
-                <Toast />
-              </Router>
-            </NotificationProvider>
-          </AuthProvider>
+          <AccessibilityProvider>
+            <AuthProvider>
+              <NotificationProvider>
+                <Router>
+                  <AppRoutes />
+                  <Toast />
+                </Router>
+              </NotificationProvider>
+            </AuthProvider>
+          </AccessibilityProvider>
         </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>

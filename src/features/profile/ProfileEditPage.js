@@ -16,8 +16,7 @@ export const ProfileEditPage = () => {
     const [userData, setUserData] = useState(null);
     const { register, handleSubmit, formState: { errors }, reset, } = useForm({
         defaultValues: {
-            firstName: '',
-            lastName: '',
+            name: '',
             email: '',
             phoneNumber: '',
             organization: '',
@@ -35,8 +34,7 @@ export const ProfileEditPage = () => {
                 // Mock user data - in real app would fetch from backend
                 const mockUser = {
                     id: user.id,
-                    firstName: 'Mohamed',
-                    lastName: 'Ahmed',
+                    name: 'Mohamed Ahmed',
                     email: user.email,
                     phoneNumber: '+20 123 456 7890',
                     fullName: 'Mohamed Ahmed',
@@ -46,8 +44,7 @@ export const ProfileEditPage = () => {
                 };
                 setUserData(mockUser);
                 reset({
-                    firstName: mockUser.firstName,
-                    lastName: mockUser.lastName,
+                    name: mockUser.name || mockUser.fullName,
                     email: mockUser.email,
                     phoneNumber: mockUser.phoneNumber,
                 });
@@ -83,19 +80,13 @@ export const ProfileEditPage = () => {
     if (loading) {
         return (_jsxs("div", { className: "min-h-screen bg-gray-50 dark:bg-gray-900", children: [_jsx(Header, {}), _jsx("main", { className: "max-w-6xl mx-auto px-4 py-8", children: _jsx("div", { className: "flex items-center justify-center h-96", children: _jsx("div", { className: "text-gray-600 dark:text-gray-400", children: "Loading profile..." }) }) })] }));
     }
-    return (_jsxs("div", { className: "min-h-screen bg-gray-50 dark:bg-gray-900", children: [_jsx(Header, {}), _jsx("main", { className: "max-w-4xl mx-auto px-4 py-8", children: _jsxs("div", { children: [_jsx("div", { className: "mb-8", children: _jsx("button", { onClick: () => navigate('/settings'), className: "text-primary-600 dark:text-primary-400 hover:underline text-sm", children: "\u2190 Back to Settings" }) }), _jsxs(Card, { bordered: true, className: "p-8", children: [_jsx("h1", { className: "text-3xl font-bold text-gray-900 dark:text-white mb-2", children: "Edit Profile" }), _jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-8", children: "Update your personal information" }), _jsxs("form", { onSubmit: handleSubmit(onSubmit), className: "space-y-6", children: [_jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [_jsx(FormField, { label: "First Name", error: errors.firstName?.message, children: _jsx("input", { ...register('firstName', {
-                                                            required: 'First name is required',
-                                                            minLength: {
-                                                                value: 2,
-                                                                message: 'First name must be at least 2 characters',
-                                                            },
-                                                        }), type: "text", placeholder: "Enter first name", className: "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition" }) }), _jsx(FormField, { label: "Last Name", error: errors.lastName?.message, children: _jsx("input", { ...register('lastName', {
-                                                            required: 'Last name is required',
-                                                            minLength: {
-                                                                value: 2,
-                                                                message: 'Last name must be at least 2 characters',
-                                                            },
-                                                        }), type: "text", placeholder: "Enter last name", className: "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition" }) })] }), _jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [_jsx(FormField, { label: "Email", error: errors.email?.message, children: _jsx("input", { ...register('email', {
+    return (_jsxs("div", { className: "min-h-screen bg-gray-50 dark:bg-gray-900", children: [_jsx(Header, {}), _jsx("main", { className: "max-w-4xl mx-auto px-4 py-8", children: _jsxs("div", { children: [_jsx("div", { className: "mb-8", children: _jsx("button", { onClick: () => navigate('/settings'), className: "text-primary-600 dark:text-primary-400 hover:underline text-sm", children: "\u2190 Back to Settings" }) }), _jsxs(Card, { bordered: true, className: "p-8", children: [_jsx("h1", { className: "text-3xl font-bold text-gray-900 dark:text-white mb-2", children: "Edit Profile" }), _jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-8", children: "Update your personal information" }), _jsxs("form", { onSubmit: handleSubmit(onSubmit), className: "space-y-6", children: [_jsx("div", { className: "grid md:grid-cols-1 gap-6", children: _jsx(FormField, { label: "Full Name", error: errors.name?.message, children: _jsx("input", { ...register('name', {
+                                                        required: 'Full name is required',
+                                                        minLength: {
+                                                            value: 2,
+                                                            message: 'Name must be at least 2 characters',
+                                                        },
+                                                    }), type: "text", placeholder: "Enter your full name", className: "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition" }) }) }), _jsxs("div", { className: "grid md:grid-cols-2 gap-6", children: [_jsx(FormField, { label: "Email", error: errors.email?.message, children: _jsx("input", { ...register('email', {
                                                             required: 'Email is required',
                                                             pattern: {
                                                                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,

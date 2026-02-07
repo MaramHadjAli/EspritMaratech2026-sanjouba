@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@components/Button';
 import { Badge } from '@components/Badge';
+import Header from '@components/Header';
 const LandingPage = () => {
     const { t } = useTranslation();
     const features = [
