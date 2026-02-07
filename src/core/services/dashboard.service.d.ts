@@ -2,7 +2,7 @@
  * Dashboard API Service
  * Handles all dashboard/analytics related API calls
  */
-import { ApiResponse, DashboardStats, RegionalStats } from '../../shared/types';
+import { ApiResponse, DashboardStats, RegionalStats } from '@shared/types';
 export declare const dashboardService: {
     /**
      * Get dashboard statistics/KPIs

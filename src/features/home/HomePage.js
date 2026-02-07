@@ -12,14 +12,13 @@ import { Button } from '@components/Button';
 import { Card } from '@components/Card';
 import { Badge } from '@components/Badge';
 import { Spinner } from '@components/Spinner';
-import Header from '@components/Header';
 import { visitService } from '@core/services/visit.service';
 import { dashboardService } from '@core/services/dashboard.service';
 const HomePage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { addNotification } = useNotification();
+    const { error: showError } = useNotification();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
         totalFamilies: 0,
@@ -46,26 +45,18 @@ const HomePage = () => {
                 });
                 // Fetch upcoming visits
                 const visitsData = await visitService.getUpcomingVisits();
-                const mappedVisits = (visitsData.data?.slice(0, 5) || []).map(visit => ({
-                    id: visit.id,
-                    title: visit.campaignName || 'Visit',
-                    date: visit.startTime || new Date().toISOString(),
-                    location: visit.address || 'N/A',
-                    participants: visit.members?.length || visit.personCount || 0,
-                    status: visit.status || 'ACTIVE',
-                }));
-                setUpcomingVisits(mappedVisits);
+                setUpcomingVisits(visitsData.data?.slice(0, 5) || []);
             }
             catch (error) {
                 console.error('Failed to fetch data:', error);
-                addNotification({ type: 'error', message: 'Failed to load dashboard data' });
+                showError('Failed to load dashboard data');
             }
             finally {
                 setLoading(false);
             }
         };
         fetchData();
-    }, [user, navigate, addNotification]);
+    }, [user, navigate, showError]);
     if (loading) {
         return (_jsx("div", { className: "min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900", children: _jsx(Spinner, { size: "lg", label: t('common.loading') || 'Loading...' }) }));
     }
