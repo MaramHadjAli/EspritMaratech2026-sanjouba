@@ -12,7 +12,6 @@ import { useLanguage } from '@hooks/useLanguage'
 import { useToast } from '@hooks/useNotification'
 import { Button } from '@components/Button'
 import { Card } from '@components/Card'
-import Header from '@components/Header'
 
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation()
@@ -30,11 +29,7 @@ const SettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="py-8">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -204,7 +199,7 @@ const SettingsPage: React.FC = () => {
                       </h3>
                       <div className="space-y-2">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Name: {user.firstName} {user.lastName}
+                          Name: {user.fullName || user.name || 'N/A'}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Email: {user.email}
@@ -254,7 +249,6 @@ const SettingsPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
     </div>
   )
 }

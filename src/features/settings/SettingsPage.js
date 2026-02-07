@@ -1,0 +1,46 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+/**
+ * Settings Page
+ * User preferences and configuration
+ */
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '@hooks/useAuth';
+import { useTheme } from '@hooks/useTheme';
+import { useLanguage } from '@hooks/useLanguage';
+import { useToast } from '@hooks/useNotification';
+import { Button } from '@components/Button';
+import { Card } from '@components/Card';
+import Header from '@components/Header';
+const SettingsPage = () => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const { isDarkMode, toggleDarkMode } = useTheme();
+    const { language, setLanguage } = useLanguage();
+    const toast = useToast();
+    const [activeTab, setActiveTab] = useState('general');
+    if (!user) {
+        navigate('/login');
+        return null;
+    }
+    return (_jsxs("div", { className: "min-h-screen bg-gray-50 dark:bg-gray-900", children: [_jsx(Header, {}), _jsx("div", { className: "py-8 px-4 sm:px-6 lg:px-8", children: _jsxs("div", { className: "max-w-7xl mx-auto", children: [_jsxs("div", { className: "mb-8", children: [_jsx("h1", { className: "text-3xl font-bold text-gray-900 dark:text-white mb-2", children: "Settings" }), _jsx("p", { className: "text-gray-600 dark:text-gray-400", children: "Manage your preferences and account settings" })] }), _jsxs("div", { className: "grid md:grid-cols-4 gap-8", children: [_jsx("div", { className: "md:col-span-1", children: _jsx(Card, { bordered: true, className: "p-4", children: _jsxs("div", { className: "space-y-2", children: [_jsx("button", { onClick: () => setActiveTab('general'), className: `w-full text-left px-4 py-2 rounded-lg transition-colors ${activeTab === 'general'
+                                                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400'
+                                                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`, children: "General" }), _jsx("button", { onClick: () => setActiveTab('appearance'), className: `w-full text-left px-4 py-2 rounded-lg transition-colors ${activeTab === 'appearance'
+                                                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400'
+                                                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`, children: "Appearance" }), _jsx("button", { onClick: () => setActiveTab('account'), className: `w-full text-left px-4 py-2 rounded-lg transition-colors ${activeTab === 'account'
+                                                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400'
+                                                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`, children: "Account" })] }) }) }), _jsxs("div", { className: "md:col-span-3 space-y-6", children: [activeTab === 'general' && (_jsxs(Card, { bordered: true, className: "p-8", children: [_jsx("h2", { className: "text-2xl font-bold text-gray-900 dark:text-white mb-6", children: "General Settings" }), _jsxs("div", { className: "space-y-6", children: [_jsxs("div", { className: "flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-800", children: [_jsxs("div", { children: [_jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: "Email Notifications" }), _jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: "Receive email updates about campaigns" })] }), _jsx("input", { type: "checkbox", className: "w-5 h-5", defaultChecked: true })] }), _jsxs("div", { className: "flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-800", children: [_jsxs("div", { children: [_jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: "Desktop Notifications" }), _jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: "Get notified about important updates" })] }), _jsx("input", { type: "checkbox", className: "w-5 h-5", defaultChecked: true })] }), _jsxs("div", { className: "flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-800", children: [_jsxs("div", { children: [_jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: "Weekly Reports" }), _jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: "Receive weekly performance reports" })] }), _jsx("input", { type: "checkbox", className: "w-5 h-5" })] })] })] })), activeTab === 'appearance' && (_jsxs(Card, { bordered: true, className: "p-8", children: [_jsx("h2", { className: "text-2xl font-bold text-gray-900 dark:text-white mb-6", children: "Appearance" }), _jsxs("div", { className: "space-y-6", children: [_jsxs("div", { className: "flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-800", children: [_jsxs("div", { children: [_jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: "Dark Mode" }), _jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: "Enable dark theme for comfortable viewing" })] }), _jsx("button", { onClick: toggleDarkMode, className: "px-4 py-2 rounded-lg bg-primary-500 text-white hover:bg-primary-600 transition-colors", children: isDarkMode ? 'Enabled' : 'Disabled' })] }), _jsxs("div", { className: "flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-gray-800", children: [_jsxs("div", { children: [_jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: "Language" }), _jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: "Choose your preferred language" })] }), _jsxs("select", { value: language, onChange: (e) => {
+                                                                        setLanguage(e.target.value);
+                                                                        toast.success('Language changed');
+                                                                    }, className: "px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white", children: [_jsx("option", { value: "en", children: "English" }), _jsx("option", { value: "fr", children: "Fran\u00E7ais" }), _jsx("option", { value: "ar", children: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629" })] })] })] })] })), activeTab === 'account' && (_jsxs(Card, { bordered: true, className: "p-8", children: [_jsx("h2", { className: "text-2xl font-bold text-gray-900 dark:text-white mb-6", children: "Account Settings" }), _jsxs("div", { className: "space-y-6", children: [_jsx("div", { className: "p-4 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-900", children: _jsxs("p", { className: "text-sm text-primary-900 dark:text-primary-100", children: ["Logged in as: ", _jsx("strong", { children: user.email })] }) }), _jsxs("div", { className: "space-y-3", children: [_jsx("h3", { className: "font-medium text-gray-900 dark:text-white", children: "Account Information" }), _jsxs("div", { className: "space-y-2", children: [_jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: ["Name: ", user.fullName || user.name || 'N/A'] }), _jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: ["Email: ", user.email] }), _jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: ["Role: ", user.role || 'User'] })] })] }), _jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [_jsx(Button, { onClick: () => navigate('/profile/edit'), className: "mb-3", children: "Edit Profile" }), _jsx(Button, { onClick: () => navigate('/profile/change-password'), variant: "ghost", className: "block", children: "Change Password" })] }), _jsxs("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: [_jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-3", children: "Danger zone" }), _jsx(Button, { onClick: () => {
+                                                                        if (confirm('Are you sure you want to logout?')) {
+                                                                            logout();
+                                                                            navigate('/login');
+                                                                            toast.success('Logged out successfully');
+                                                                        }
+                                                                    }, className: "text-danger bg-danger hover:bg-danger-600", children: "Logout" })] })] })] }))] })] })] }) })] }));
+};
+export default SettingsPage;
+//# sourceMappingURL=SettingsPage.js.map

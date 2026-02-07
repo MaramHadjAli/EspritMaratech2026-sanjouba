@@ -28,6 +28,44 @@
   color-scheme: dark;
 }
 
+/* High Contrast Mode */
+.high-contrast {
+  --color-primary: #0066cc;
+  --color-text: #000000;
+  --color-text-secondary: #333333;
+  --color-bg: #ffffff;
+  --color-border: #000000;
+}
+
+.high-contrast.dark,
+.high-contrast[data-theme='dark'] {
+  --color-primary: #66b3ff;
+  --color-text: #ffffff;
+  --color-text-secondary: #eeeeee;
+  --color-bg: #000000;
+  --color-border: #ffffff;
+}
+
+.high-contrast * {
+  border-color: currentColor !important;
+}
+
+.high-contrast a,
+.high-contrast button {
+  text-decoration: underline !important;
+}
+
+.high-contrast a:focus,
+.high-contrast button:focus {
+  outline: 3px solid currentColor !important;
+  outline-offset: 2px !important;
+}
+
+/* Accessibility Font Scale */
+html {
+  font-size: calc(16px * var(--accessibility-font-scale, 1));
+}
+
 /* Global Styles */
 * {
   margin: 0;
@@ -89,6 +127,43 @@ body {
     --color-bg: #000000;
     --color-border: #ffffff;
   }
+}
+
+/* High Contrast Mode (class-based for manual toggle) */
+.high-contrast {
+  --color-text: #000000;
+  --color-bg: #ffffff;
+  --color-border: #000000;
+  --color-primary: #0000ff;
+  --color-primary-light: #e6e6ff;
+  --color-primary-dark: #000080;
+}
+
+.high-contrast * {
+  border-color: #000000 !important;
+}
+
+.high-contrast a,
+.high-contrast button {
+  text-decoration: underline;
+}
+
+.dark-high-contrast {
+  --color-text: #ffffff;
+  --color-bg: #000000;
+  --color-border: #ffffff;
+  --color-primary: #00ffff;
+  --color-primary-light: #001a1a;
+  --color-primary-dark: #008080;
+}
+
+.dark-high-contrast * {
+  border-color: #ffffff !important;
+}
+
+.dark-high-contrast a,
+.dark-high-contrast button {
+  text-decoration: underline;
 }
 
 /* Headings */

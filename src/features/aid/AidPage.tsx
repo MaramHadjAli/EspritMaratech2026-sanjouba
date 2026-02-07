@@ -12,7 +12,6 @@ import { Button } from '@components/Button'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Spinner } from '@components/Spinner'
-import Header from '@components/Header'
 import { FormField } from '@components/FormField'
 import { TextInput } from '@components/TextInput'
 import { SelectInput } from '@components/SelectInput'
@@ -142,9 +141,7 @@ const AidPage: React.FC = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
+    <>
       <div className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -383,7 +380,7 @@ const AidPage: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

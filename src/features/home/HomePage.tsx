@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
-  const { error: showError } = useNotification()
+  const { addNotification } = useNotification()
 
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats>({
@@ -67,17 +67,25 @@ const HomePage: React.FC = () => {
 
         // Fetch upcoming visits
         const visitsData = await visitService.getUpcomingVisits()
-        setUpcomingVisits(visitsData.data?.slice(0, 5) || [])
+        const mappedVisits: UpcomingVisit[] = (visitsData.data?.slice(0, 5) || []).map(visit => ({
+          id: visit.id,
+          title: visit.campaignName || 'Visit',
+          date: visit.startTime || new Date().toISOString(),
+          location: visit.address || 'N/A',
+          participants: visit.members?.length || visit.personCount || 0,
+          status: visit.status || 'ACTIVE',
+        }))
+        setUpcomingVisits(mappedVisits)
       } catch (error) {
         console.error('Failed to fetch data:', error)
-        showError('Failed to load dashboard data')
+        addNotification({ type: 'error', message: 'Failed to load dashboard data' })
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [user, navigate, showError])
+  }, [user, navigate, addNotification])
 
   if (loading) {
     return (
@@ -88,15 +96,11 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="py-8">
           {/* Welcome Section */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Welcome back, {currentUser?.firstName}!
+              Welcome back, {user?.fullName || user?.name || 'User'}!
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Here's what's happening with your charitable work today.
@@ -304,8 +308,6 @@ const HomePage: React.FC = () => {
               </div>
             </Card>
           </div>
-        </div>
-      </div>
     </div>
   )
 }

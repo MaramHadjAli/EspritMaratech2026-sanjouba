@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useTheme } from '@hooks/useTheme'
 import { useLanguage } from '@hooks/useLanguage'
+import AccessibilityControls from './AccessibilityControls'
 
 const Header: React.FC = () => {
   const { t } = useTranslation()
@@ -30,11 +31,14 @@ const Header: React.FC = () => {
           <Link to="/home" className="text-gray-600 dark:text-gray-400 hover:text-primary-500 font-medium transition-colors">
             {t('navigation.home')}
           </Link>
-          <Link to="/campaigns" className="text-gray-600 dark:text-gray-400 hover:text-primary-500 font-medium transition-colors">
-            {t('navigation.campaigns')}
-          </Link>
           <Link to="/dashboard" className="text-gray-600 dark:text-gray-400 hover:text-primary-500 font-medium transition-colors">
             {t('navigation.dashboard')}
+          </Link>
+          <Link to="/visits" className="text-gray-600 dark:text-gray-400 hover:text-primary-500 font-medium transition-colors">
+            {t('navigation.visits')}
+          </Link>
+          <Link to="/families" className="text-gray-600 dark:text-gray-400 hover:text-primary-500 font-medium transition-colors">
+            {t('navigation.families')}
           </Link>
         </div>
 
@@ -64,6 +68,9 @@ const Header: React.FC = () => {
               <MoonIcon className="w-5 h-5 text-gray-600" />
             )}
           </button>
+
+          {/* Accessibility Controls */}
+          <AccessibilityControls />
 
           {/* Mobile Menu Button */}
           <button

@@ -12,7 +12,6 @@ import { Button } from '@components/Button'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Spinner } from '@components/Spinner'
-import Header from '@components/Header'
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -72,11 +71,7 @@ const DashboardPage: React.FC = () => {
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="py-8">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -280,7 +275,6 @@ const DashboardPage: React.FC = () => {
             </Button>
           </div>
         </div>
-      </div>
     </div>
   )
 }

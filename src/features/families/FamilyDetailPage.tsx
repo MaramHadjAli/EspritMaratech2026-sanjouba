@@ -12,7 +12,6 @@ import { Spinner } from '@components/Spinner'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Button } from '@components/Button'
-import Header from '@components/Header'
 import type { Family } from '@/shared/types'
 
 const FamilyDetailPage: React.FC = () => {
@@ -40,8 +39,7 @@ const FamilyDetailPage: React.FC = () => {
           numberOfMembers: 4,
           phoneNumber: '+216 99 999 999',
           address: 'Sample Address',
-          firstName: 'Sample',
-          lastName: 'Family',
+          name: 'Sample Family',
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
@@ -73,43 +71,29 @@ const FamilyDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header />
-        <div className="py-8 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <Spinner />
-          </div>
-        </div>
+      <div className="py-8">
+        <Spinner />
       </div>
     )
   }
 
   if (!family) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Header />
-        <div className="py-8 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <Card bordered className="p-8 text-center">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Family not found
-              </p>
-              <Button onClick={() => navigate('/families')}>
-                Back to Families
-              </Button>
-            </Card>
-          </div>
-        </div>
+      <div className="py-8">
+        <Card bordered className="p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Family not found
+          </p>
+          <Button onClick={() => navigate('/families')}>
+            Back to Families
+          </Button>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="py-8">
           {/* Navigation */}
           <div className="mb-6 flex items-center justify-between">
             <button
@@ -286,7 +270,6 @@ const FamilyDetailPage: React.FC = () => {
             </div>
           </Card>
         </div>
-      </div>
     </div>
   )
 }
