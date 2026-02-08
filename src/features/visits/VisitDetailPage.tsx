@@ -12,7 +12,6 @@ import { Spinner } from '@components/Spinner'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Button } from '@components/Button'
-import { DownloadDonationPDF, buildDonationPDFData, DEFAULT_ORGANIZATION } from '@components/DownloadPDF'
 import CreateAidDistributionModal from './CreateAidDistributionModal'
 import type { Visit } from '@/shared/types'
 
@@ -171,46 +170,6 @@ const VisitDetailPage: React.FC = () => {
               </Button>
             </div>
           </div>
-
-          {/* PDF Download Section */}
-          {visit.isCompleted && (
-            <Card bordered className="p-4 mb-6 bg-gradient-to-r from-emerald-50 to-sky-50 dark:from-emerald-900/20 dark:to-sky-900/20">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Certificat de visite</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Téléchargez le certificat officiel de cette visite</p>
-                </div>
-                <DownloadDonationPDF
-                  data={buildDonationPDFData({
-                    donor: {
-                      name: user?.name || 'Bénévole OMNIA',
-                      email: user?.email,
-                    },
-                    visit: {
-                      id: visit.id,
-                      name: `Visite ${visit.city}`,
-                      date: new Date(visit.startDate),
-                      location: visit.city || 'Non spécifié',
-                      region: visit.region || undefined,
-                    },
-                    family: {
-                      id: 'FAM-001',
-                      lastName: 'Famille bénéficiaire',
-                      numberOfMembers: 4,
-                      address: visit.city || undefined,
-                    },
-                    aids: [
-                      { type: 'Aide alimentaire', name: 'Colis alimentaire', quantity: 1, unit: 'colis' },
-                    ],
-                    notes: visit.notes || undefined,
-                    signedBy: user?.name,
-                    organization: DEFAULT_ORGANIZATION,
-                  })}
-                  label="Télécharger PDF"
-                />
-              </div>
-            </Card>
-          )}
 
           {/* Header Section */}
           <Card bordered className="p-8 mb-6">

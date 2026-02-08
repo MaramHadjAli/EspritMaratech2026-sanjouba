@@ -19,7 +19,6 @@ import { TextInput } from '@components/TextInput'
 import { SelectInput } from '@components/SelectInput'
 import { AccessibleModal } from '@components/AccessibleModal'
 import { CheckboxInput } from '@components/CheckboxInput'
-import { DownloadDonationPDF, buildDonationPDFData, DEFAULT_ORGANIZATION, type DonationPDFData } from '@components/DownloadPDF'
 import type { Family, Aid } from '@/shared/types'
 
 interface CreateAidDistributionModalProps {
@@ -46,7 +45,6 @@ const CreateAidDistributionModal: React.FC<CreateAidDistributionModalProps> = ({
   const { user } = useAuth()
   const [phase, setPhase] = useState<1 | 2 | 3 | 4>(1)
   const [loading, setLoading] = useState(false)
-  const [pdfData, setPdfData] = useState<DonationPDFData | null>(null)
 
   // Phase 1: Family selection
   const [familySearch, setFamilySearch] = useState('')
@@ -278,37 +276,6 @@ const CreateAidDistributionModal: React.FC<CreateAidDistributionModalProps> = ({
         notes: familyNotes,
       })
 
-      // Build PDF data for download
-      const generatedPdfData = buildDonationPDFData({
-        donor: {
-          name: user?.name || 'Bénévole OMNIA',
-          email: user?.email,
-        },
-        visit: {
-          id: visitId,
-          name: 'Distribution d\'aide',
-          date: new Date(),
-          location: 'Visite en cours',
-        },
-        family: {
-          id: selectedFamily.id,
-          lastName: selectedFamily.lastName,
-          numberOfMembers: selectedFamily.numberOfMembers,
-          address: selectedFamily.address || undefined,
-          vulnerabilityScore: selectedFamily.vulnerabilityScore,
-        },
-        aids: selectedAids.map(aid => ({
-          type: aid.isRecommended ? 'Recommandé' : 'Personnalisé',
-          name: aid.aidName,
-          quantity: aid.quantity,
-          unit: 'unité(s)',
-        })),
-        notes: familyNotes || undefined,
-        signedBy: user?.name,
-        organization: DEFAULT_ORGANIZATION,
-      })
-      setPdfData(generatedPdfData)
-
       success('Aide distribuée avec succès!')
       setPhase(4) // Go to success phase
     } catch (err) {
@@ -327,8 +294,8 @@ const CreateAidDistributionModal: React.FC<CreateAidDistributionModalProps> = ({
       size="lg"
     >
       <div className="space-y-6 py-4">
-        {/* Phase 4: Success with PDF Download */}
-        {phase === 4 && pdfData && (
+        {/* Phase 4: Success */}
+        {phase === 4 && (
           <div className="text-center space-y-6">
             <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-emerald-500 to-sky-400 flex items-center justify-center text-4xl shadow-lg">
               ✅
@@ -341,17 +308,6 @@ const CreateAidDistributionModal: React.FC<CreateAidDistributionModalProps> = ({
                 La famille <strong>{selectedFamily?.lastName}</strong> a reçu {selectedAids.length} type(s) d'aide.
               </p>
             </div>
-
-            <Card bordered className="p-4 bg-gradient-to-r from-emerald-50 to-sky-50 dark:from-emerald-900/20 dark:to-sky-900/20">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                Téléchargez le certificat officiel de cette distribution
-              </p>
-              <DownloadDonationPDF
-                data={pdfData}
-                label="📄 Télécharger le certificat PDF"
-                className="w-full justify-center"
-              />
-            </Card>
 
             <div className="flex gap-3 justify-center pt-2">
               <Button
@@ -370,7 +326,6 @@ const CreateAidDistributionModal: React.FC<CreateAidDistributionModalProps> = ({
                   setSelectedFamily(null)
                   setSelectedAids([])
                   setFamilySearch('')
-                  setPdfData(null)
                 }}
                 className="bg-emerald-600 hover:bg-emerald-700"
               >

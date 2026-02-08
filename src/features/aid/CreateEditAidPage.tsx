@@ -3,17 +3,17 @@
  * Simple form for creating/editing aid with proper fields
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useToast } from '@hooks/useNotification'
 import { aidService } from '@services/aid.service'
 import { familyService } from '@services/family.service'
-import { Button } from '@components/Button'
 import { StepProgressBar, Step } from '@components/StepProgressBar'
 import Header from '@components/Header'
 import { useOffline } from '@hooks/useOffline'
+import axiosInstance from '@/api/axiosInstance'
 
 // ---------- SVG Icons for visual polish ----------
 const PhoneIcon = () => (
@@ -148,11 +148,6 @@ const AID_CATEGORIES = [
 ]
 
 const CreateEditAidPage: React.FC = () => {
-    // Deposit recommendation state
-    const [recommendedDeposits, setRecommendedDeposits] = useState<any[]>([])
-    const [recommendLoading, setRecommendLoading] = useState(false)
-    const [selectedDepositId, setSelectedDepositId] = useState('')
-    const [recommendError, setRecommendError] = useState('')
   const { id } = useParams<{ id?: string }>()
   const navigate = useNavigate()
   const { i18n } = useTranslation()
@@ -162,8 +157,16 @@ const CreateEditAidPage: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState(0)
   const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [stepErrors, setStepErrors] = useState<Record<string, string>>({})
   const formRef = useRef<HTMLDivElement>(null)
+
+  // Deposit recommendation state
+  const [recommendedDeposits, setRecommendedDeposits] = useState<any[]>([])
+  const [recommendLoading, setRecommendLoading] = useState(false)
+  const [selectedDepositId, setSelectedDepositId] = useState('')
+  const [recommendError, setRecommendError] = useState('')
 
   // Step 1 fields (required)
   const [phone, setPhone] = useState('')
@@ -183,6 +186,10 @@ const CreateEditAidPage: React.FC = () => {
   const [description, setDescription] = useState('')
   const [quantity, setQuantity] = useState('1')
   const [notes, setNotes] = useState('')
+  const [requiresRefrigeration, setRequiresRefrigeration] = useState(false)
+  const [requiredHumidityLevel, setRequiredHumidityLevel] = useState('')
+  const [requiredMinTemperatureC, setRequiredMinTemperatureC] = useState('')
+  const [requiredMaxTemperatureC, setRequiredMaxTemperatureC] = useState('')
 
   const isEditing = !!id
   const lang = i18n.language
@@ -202,15 +209,20 @@ const CreateEditAidPage: React.FC = () => {
     },
   ]
 
+  useEffect(() => {
+    if (!user) {
+      navigate('/login')
+    }
+  }, [user, navigate])
+
   if (!user) {
-    navigate('/login')
     return null
   }
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!name.trim()) {
+    if (!lastName.trim()) {
       newErrors.name = lang === 'fr' ? 'Le nom est requis' : lang === 'ar' ? 'الاسم مطلوب' : 'Name is required'
     }
     if (!aidType) {
@@ -241,6 +253,7 @@ const CreateEditAidPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validateForm()) return
+    
     if (!recommendedDeposits.length) {
       // Recommend deposits first
       setRecommendLoading(true)
@@ -262,10 +275,12 @@ const CreateEditAidPage: React.FC = () => {
       }
       return
     }
+    
     if (!selectedDepositId) {
       setRecommendError('Please select a deposit')
       return
     }
+    
     try {
       setSubmitting(true)
 
@@ -287,10 +302,10 @@ const CreateEditAidPage: React.FC = () => {
       const aidPayload = {
         familyId: '',
         type: aidType,
-        description: description || undefined,
+        description: description || notes || undefined,
         quantity: Number(quantity),
         unit: 'unit',
-        description: notes || undefined,
+        depositId: selectedDepositId,
       }
 
       // ── OFFLINE MODE ──
@@ -332,13 +347,13 @@ const CreateEditAidPage: React.FC = () => {
       aidPayload.familyId = familyId
 
       if (isEditing) {
-        const response = await aidService.updateAid(id!, payload)
+        const response = await aidService.updateAid(id!, aidPayload)
         if (response) {
           success(lang === 'fr' ? 'Aide mise à jour' : lang === 'ar' ? 'تم تحديث المساعدة' : 'Aid updated successfully')
           navigate(`/aid/${id}`)
         }
       } else {
-        const response = await aidService.createAid(payload)
+        const response = await aidService.createAid(aidPayload)
         if (response) {
           success(
             lang === 'fr'
@@ -351,8 +366,6 @@ const CreateEditAidPage: React.FC = () => {
         }
       }
     } catch (err) {
-      // If network fails mid-submit, queue it offline
-      // Note: Deduplication in offlineStorage prevents double queuing
       if (!navigator.onLine) {
         const familyPayload = {
           name: lastName,
@@ -373,7 +386,6 @@ const CreateEditAidPage: React.FC = () => {
           unit: 'unit',
           description: notes || undefined,
         }
-        // Queue both family and aid (deduplication handles if already queued)
         await queueAction({
           type: 'CREATE_FAMILY',
           endpoint: '/family',
@@ -451,325 +463,495 @@ const CreateEditAidPage: React.FC = () => {
           </p>
         </div>
 
-            {/* Step Progress Bar */}
-            <div className="px-6 sm:px-10 pb-8">
-              <StepProgressBar steps={steps} currentStep={currentStep} />
-            </div>
+        {/* Step Progress Bar */}
+        <div className="px-6 sm:px-10 pb-8">
+          <StepProgressBar steps={steps} currentStep={currentStep} />
+        </div>
 
-            {/* Step Content */}
-            <div className="px-6 sm:px-10 pb-10">
-
-              {/* ===== STEP 1: Identification ===== */}
-              {currentStep === 0 && (
-                <div className="space-y-5 animate-fade-in">
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                      <UserIcon />
-                    </div>
-                    <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-                      {lang === 'fr' ? 'Informations de contact' : lang === 'ar' ? 'المعلومات الاتصال' : 'Contact Information'}
-                    </h2>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          {/* Step Content */}
+          <div ref={formRef} className="space-y-6">
+            {/* ===== STEP 1: Identification ===== */}
+            {currentStep === 0 && (
+              <div className="space-y-5 animate-fade-in">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <UserIcon />
                   </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      {lang === 'fr' ? 'Numéro de téléphone' : lang === 'ar' ? 'رقم الهاتف' : 'Phone Number'} <span className="text-red-500">*</span>
-                    </label>
-                    <InputWithIcon icon={<PhoneIcon />} error={stepErrors.phone}>
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => { setPhone(e.target.value); setStepErrors(prev => ({ ...prev, phone: '' })) }}
-                        placeholder={lang === 'fr' ? 'Ex: +216 XX XXX XXX' : 'Ex: +216 XX XXX XXX'}
-                        className="w-full px-3 py-3.5 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-sm"
-                      />
-                    </InputWithIcon>
-                  </div>
-
-                  {/* Last Name */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      {lang === 'fr' ? 'Nom de famille' : lang === 'ar' ? 'اسم العائلة' : 'Last Name'} <span className="text-red-500">*</span>
-                    </label>
-                    <InputWithIcon icon={<UserIcon />} error={stepErrors.lastName}>
-                      <input
-                        type="text"
-                        value={lastName}
-                        onChange={(e) => { setLastName(e.target.value); setStepErrors(prev => ({ ...prev, lastName: '' })) }}
-                        placeholder={lang === 'fr' ? 'Nom de la famille' : lang === 'ar' ? 'اسم العائلة' : 'Family name'}
-                        className="w-full px-3 py-3.5 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-sm"
-                      />
-                    </InputWithIcon>
-                  </div>
-
-            {/* Type */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                {lang === 'fr' ? 'Type d\'aide' : lang === 'ar' ? 'نوع المساعدة' : 'Aid Type'}{' '}
-                <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={aidType}
-                onChange={(e) => {
-                  setAidType(e.target.value)
-                  if (errors.type) setErrors({ ...errors, type: '' })
-                }}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                  ${
-                    errors.type
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'
-                  }
-                `}
-              >
-                <option value="FOOD">🍞 {lang === 'fr' ? 'Alimentaire' : lang === 'ar' ? 'غذائية' : 'Food'}</option>
-                <option value="MEDICAL">💊 {lang === 'fr' ? 'Médicale' : lang === 'ar' ? 'طبية' : 'Medical'}</option>
-                <option value="EDUCATIONAL">📚 {lang === 'fr' ? 'Éducative' : lang === 'ar' ? 'تعليمية' : 'Educational'}</option>
-                <option value="CLOTHING">👔 {lang === 'fr' ? 'Vestimentaire' : lang === 'ar' ? 'ملابس' : 'Clothing'}</option>
-                <option value="SHELTER">🏠 {lang === 'fr' ? 'Logement' : lang === 'ar' ? 'إيواء' : 'Shelter'}</option>
-                <option value="OTHER">📦 {lang === 'fr' ? 'Autre' : lang === 'ar' ? 'أخرى' : 'Other'}</option>
-              </select>
-              {errors.type && <p className="mt-1 text-sm text-red-500">{errors.type}</p>}
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                {lang === 'fr' ? 'Description' : lang === 'ar' ? 'الوصف' : 'Description'}
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder={lang === 'fr' ? 'Détails supplémentaires...' : lang === 'ar' ? 'التفاصيل الإضافية...' : 'Additional details...'}
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
-              />
-            </div>
-
-            {/* Quantity */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                {lang === 'fr' ? 'Quantité' : lang === 'ar' ? 'الكمية' : 'Quantity'}{' '}
-                <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) => {
-                  setQuantity(e.target.value)
-                  if (errors.quantity) setErrors({ ...errors, quantity: '' })
-                }}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                  ${
-                    errors.quantity
-                      ? 'border-red-500 focus:ring-red-500'
-                      : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'
-                  }
-                `}
-              />
-              {errors.quantity && <p className="mt-1 text-sm text-red-500">{errors.quantity}</p>}
-            </div>
-
-            {/* Refrigeration */}
-            <div>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={requiresRefrigeration}
-                  onChange={(e) => setRequiresRefrigeration(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 accent-primary-500"
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {lang === 'fr'
-                    ? 'Requiert de la réfrigération'
-                    : lang === 'ar'
-                      ? 'يتطلب الثلاجة'
-                      : 'Requires Refrigeration'}
-                </span>
-              </label>
-            </div>
-
-            {/* Humidity Level */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                {lang === 'fr' ? 'Niveau d\'humidité requis' : lang === 'ar' ? 'مستوى الرطوبة المطلوب' : 'Required Humidity Level'}
-              </label>
-              <select
-                value={requiredHumidityLevel}
-                onChange={(e) => setRequiredHumidityLevel(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="">
-                  {lang === 'fr' ? 'Aucun' : lang === 'ar' ? 'لا شيء' : 'None'}
-                </option>
-                <option value="LOW">
-                  {lang === 'fr' ? 'Basse' : lang === 'ar' ? 'منخفضة' : 'Low'}
-                </option>
-                <option value="MEDIUM">
-                  {lang === 'fr' ? 'Moyenne' : lang === 'ar' ? 'متوسطة' : 'Medium'}
-                </option>
-                <option value="HIGH">
-                  {lang === 'fr' ? 'Haute' : lang === 'ar' ? 'عالية' : 'High'}
-                </option>
-              </select>
-            </div>
-
-            {/* Temperature Range */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {lang === 'fr'
-                    ? 'Temp min (C°)'
-                    : lang === 'ar'
-                      ? 'درجة الحرارة الدنيا'
-                      : 'Min Temp (°C)'}
-                </label>
-                <input
-                  type="number"
-                  min="-50"
-                  max="80"
-                  value={requiredMinTemperatureC}
-                  onChange={(e) => {
-                    setRequiredMinTemperatureC(e.target.value)
-                    if (errors.temperature) setErrors({ ...errors, temperature: '' })
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {lang === 'fr'
-                    ? 'Temp max (C°)'
-                    : lang === 'ar'
-                      ? 'درجة الحرارة العليا'
-                      : 'Max Temp (°C)'}
-                </label>
-                <input
-                  type="number"
-                  min="-50"
-                  max="80"
-                  value={requiredMaxTemperatureC}
-                  onChange={(e) => {
-                    setRequiredMaxTemperatureC(e.target.value)
-                    if (errors.temperature) setErrors({ ...errors, temperature: '' })
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-            {errors.temperature && <p className="text-sm text-red-500">{errors.temperature}</p>}
-
-            {/* Family selection */}
-            
-            <div className="flex gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <button
-                type="button"
-                onClick={() => navigate(isEditing ? `/aid/${id}` : '/aid')}
-                className="flex-1 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-              >
-                {lang === 'fr' ? 'Annuler' : lang === 'ar' ? 'إلغاء' : 'Cancel'}
-              </button>
-              <button
-                type="button"
-                disabled={recommendLoading || recommendedDeposits.length > 0}
-                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={async () => {
-                  setRecommendLoading(true)
-                  setRecommendError('')
-                  try {
-                    const dto = {
-                      quantity: Number(quantity),
-                      requiredHumidityLevel: requiredHumidityLevel || undefined,
-                      requiredMinTemperatureC: requiredMinTemperatureC ? Number(requiredMinTemperatureC) : undefined,
-                      requiredMaxTemperatureC: requiredMaxTemperatureC ? Number(requiredMaxTemperatureC) : undefined,
-                      requiredCapabilities: requiresRefrigeration ? ['refrigeration'] : undefined,
-                    }
-                    const response = await axiosInstance.post('/deposits/recommend', dto)
-                    setRecommendedDeposits(response.data)
-                  } catch (err) {
-                    setRecommendError('Failed to recommend deposits')
-                  } finally {
-                    setRecommendLoading(false)
-                  }
-                }}
-              >
-                {recommendLoading ? (lang === 'fr' ? 'Recherche...' : lang === 'ar' ? 'جاري البحث...' : 'Getting deposits...') : (lang === 'fr' ? 'Obtenir dépôts' : lang === 'ar' ? 'الحصول على المستودعات' : 'Get Deposits')}
-              </button>
-              <button
-                type="submit"
-                disabled={submitting || recommendLoading || !recommendedDeposits.length}
-                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submitting
-                  ? lang === 'fr'
-                    ? 'Envoi...'
-                    : lang === 'ar'
-                      ? 'إرسال...'
-                      : 'Submitting...'
-                  : isEditing
-                    ? lang === 'fr'
-                      ? 'Mettre à jour'
-                      : lang === 'ar'
-                        ? 'تحديث'
-                        : 'Update'
-                    : lang === 'fr'
-                      ? 'Créer'
-                      : lang === 'ar'
-                        ? 'إنشاء'
-                        : 'Create'}
-              </button>
-            </div>
-            {recommendError && <p className="mt-4 text-sm text-red-500">{recommendError}</p>}
-            {recommendedDeposits.length > 0 && (
-              <div className="mt-6">
-                <div className="mb-4 flex gap-4 overflow-x-auto">
-                  {recommendedDeposits.map(deposit => {
-                    const fillPercent = Math.round((deposit.currentQuantity / deposit.capacity) * 100)
-                    return (
-                      <div
-                        key={deposit.id}
-                        className={`relative flex flex-col items-center p-3 rounded-lg shadow border transition-all cursor-pointer ${selectedDepositId === deposit.id ? 'border-primary-500 bg-primary-50 dark:bg-primary-900' : 'border-gray-200 bg-white dark:bg-gray-800'}`}
-                        style={{ minWidth: 220, zIndex: 10 }}
-                        onClick={() => setSelectedDepositId(deposit.id)}
-                      >
-                        <img src={deposit.containerImageUrl} alt={deposit.name} className="w-32 h-20 object-cover rounded mb-2" />
-                        <div className="w-full h-2 bg-gray-200 rounded mb-2">
-                          <div
-                            className="h-2 rounded bg-primary-500"
-                            style={{ width: `${fillPercent}%` }}
-                          ></div>
-                        </div>
-                        <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{deposit.name}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{deposit.city} ({deposit.region})</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'fr' ? 'Remplissage' : lang === 'ar' ? 'مملوء' : 'Full'}: {fillPercent}%</div>
-                      </div>
-                    )
-                  })}
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                    {lang === 'fr' ? 'Informations de contact' : lang === 'ar' ? 'المعلومات الاتصال' : 'Contact Information'}
+                  </h2>
                 </div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {lang === 'fr' ? 'Sélectionner un dépôt recommandé' : lang === 'ar' ? 'اختر مستودعاً موصى به' : 'Select a recommended deposit'}
-                </label>
-                <select
-                  value={selectedDepositId}
-                  onChange={e => setSelectedDepositId(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="">{lang === 'fr' ? 'Sélectionner' : lang === 'ar' ? 'اختر' : 'Select'}</option>
-                  {recommendedDeposits.map(deposit => (
-                    <option key={deposit.id} value={deposit.id}>
-                      {deposit.name} ({deposit.city || 'N/A'})
-                    </option>
-                  ))}
-                </select>
+
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Numéro de téléphone' : lang === 'ar' ? 'رقم الهاتف' : 'Phone Number'} <span className="text-red-500">*</span>
+                  </label>
+                  <InputWithIcon icon={<PhoneIcon />} error={stepErrors.phone}>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => { setPhone(e.target.value); setStepErrors(prev => ({ ...prev, phone: '' })) }}
+                      placeholder={lang === 'fr' ? 'Ex: +216 XX XXX XXX' : 'Ex: +216 XX XXX XXX'}
+                      className="w-full px-3 py-3.5 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-sm"
+                    />
+                  </InputWithIcon>
+                </div>
+
+                {/* Last Name */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Nom de famille' : lang === 'ar' ? 'اسم العائلة' : 'Last Name'} <span className="text-red-500">*</span>
+                  </label>
+                  <InputWithIcon icon={<UserIcon />} error={stepErrors.lastName}>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => { setLastName(e.target.value); setStepErrors(prev => ({ ...prev, lastName: '' })) }}
+                      placeholder={lang === 'fr' ? 'Nom de la famille' : lang === 'ar' ? 'اسم العائلة' : 'Family name'}
+                      className="w-full px-3 py-3.5 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-sm"
+                    />
+                  </InputWithIcon>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Localisation' : lang === 'ar' ? 'الموقع' : 'Location'}
+                  </label>
+                  <InputWithIcon icon={<MapIcon />}>
+                    <input
+                      type="text"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder={lang === 'fr' ? 'Ville, région...' : lang === 'ar' ? 'المدينة، المنطقة...' : 'City, region...'}
+                      className="w-full px-3 py-3.5 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-sm"
+                    />
+                  </InputWithIcon>
+                </div>
               </div>
             )}
-          </form>
-        </div>
+
+            {/* ===== STEP 2: Family Details ===== */}
+            {currentStep === 1 && (
+              <div className="space-y-5 animate-fade-in">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <UsersIcon />
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                    {lang === 'fr' ? 'Détails de la famille' : lang === 'ar' ? 'تفاصيل العائلة' : 'Family Details'}
+                  </h2>
+                </div>
+
+                {/* Address */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Adresse' : lang === 'ar' ? 'العنوان' : 'Address'}
+                  </label>
+                  <InputWithIcon icon={<HomeIcon />}>
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder={lang === 'fr' ? 'Adresse complète' : lang === 'ar' ? 'العنوان الكامل' : 'Full address'}
+                      className="w-full px-3 py-3.5 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-sm"
+                    />
+                  </InputWithIcon>
+                </div>
+
+                {/* Number of members */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Nombre de membres' : lang === 'ar' ? 'عدد الأفراد' : 'Number of Members'}
+                  </label>
+                  <InputWithIcon icon={<UsersIcon />}>
+                    <input
+                      type="number"
+                      min="1"
+                      value={numberOfMembers}
+                      onChange={(e) => setNumberOfMembers(e.target.value)}
+                      placeholder="1"
+                      className="w-full px-3 py-3.5 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-sm"
+                    />
+                  </InputWithIcon>
+                </div>
+
+                {/* Toggles */}
+                <div className="space-y-3">
+                  <ToggleSwitch
+                    checked={hasElderly}
+                    onChange={setHasElderly}
+                    label={lang === 'fr' ? 'Personnes âgées' : lang === 'ar' ? 'كبار السن' : 'Elderly members'}
+                    icon="👴"
+                  />
+                  <ToggleSwitch
+                    checked={hasDisabled}
+                    onChange={setHasDisabled}
+                    label={lang === 'fr' ? 'Personnes handicapées' : lang === 'ar' ? 'ذوي الاحتياجات الخاصة' : 'Disabled members'}
+                    icon="♿"
+                  />
+                  <ToggleSwitch
+                    checked={hasStudent}
+                    onChange={setHasStudent}
+                    label={lang === 'fr' ? 'Étudiants' : lang === 'ar' ? 'طلاب' : 'Students'}
+                    icon="🎓"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* ===== STEP 3: Aid Details ===== */}
+            {currentStep === 2 && (
+              <div className="space-y-5 animate-fade-in">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <GiftIcon />
+                  </div>
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-white">
+                    {lang === 'fr' ? 'Détails de l\'aide' : lang === 'ar' ? 'تفاصيل المساعدة' : 'Aid Details'}
+                  </h2>
+                </div>
+
+                {/* Type */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Type d\'aide' : lang === 'ar' ? 'نوع المساعدة' : 'Aid Type'}{' '}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={aidType}
+                    onChange={(e) => {
+                      setAidType(e.target.value)
+                      if (errors.type) setErrors({ ...errors, type: '' })
+                    }}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                      ${errors.type ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'}
+                    `}
+                  >
+                    <option value="FOOD">🍞 {lang === 'fr' ? 'Alimentaire' : lang === 'ar' ? 'غذائية' : 'Food'}</option>
+                    <option value="MEDICAL">💊 {lang === 'fr' ? 'Médicale' : lang === 'ar' ? 'طبية' : 'Medical'}</option>
+                    <option value="EDUCATIONAL">📚 {lang === 'fr' ? 'Éducative' : lang === 'ar' ? 'تعليمية' : 'Educational'}</option>
+                    <option value="CLOTHING">👔 {lang === 'fr' ? 'Vestimentaire' : lang === 'ar' ? 'ملابس' : 'Clothing'}</option>
+                    <option value="SHELTER">🏠 {lang === 'fr' ? 'Logement' : lang === 'ar' ? 'إيواء' : 'Shelter'}</option>
+                    <option value="OTHER">📦 {lang === 'fr' ? 'Autre' : lang === 'ar' ? 'أخرى' : 'Other'}</option>
+                  </select>
+                  {errors.type && <p className="mt-1 text-sm text-red-500">{errors.type}</p>}
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Description' : lang === 'ar' ? 'الوصف' : 'Description'}
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder={lang === 'fr' ? 'Détails supplémentaires...' : lang === 'ar' ? 'التفاصيل الإضافية...' : 'Additional details...'}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  />
+                </div>
+
+                {/* Quantity */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Quantité' : lang === 'ar' ? 'الكمية' : 'Quantity'}{' '}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => {
+                      setQuantity(e.target.value)
+                      if (errors.quantity) setErrors({ ...errors, quantity: '' })
+                    }}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                      ${errors.quantity ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600 focus:ring-primary-500'}
+                    `}
+                  />
+                  {errors.quantity && <p className="mt-1 text-sm text-red-500">{errors.quantity}</p>}
+                </div>
+
+                {/* Refrigeration */}
+                <div>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={requiresRefrigeration}
+                      onChange={(e) => setRequiresRefrigeration(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 accent-primary-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {lang === 'fr'
+                        ? 'Requiert de la réfrigération'
+                        : lang === 'ar'
+                          ? 'يتطلب الثلاجة'
+                          : 'Requires Refrigeration'}
+                    </span>
+                  </label>
+                </div>
+
+                {/* Humidity Level */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    {lang === 'fr' ? 'Niveau d\'humidité requis' : lang === 'ar' ? 'مستوى الرطوبة المطلوب' : 'Required Humidity Level'}
+                  </label>
+                  <select
+                    value={requiredHumidityLevel}
+                    onChange={(e) => setRequiredHumidityLevel(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">{lang === 'fr' ? 'Aucun' : lang === 'ar' ? 'لا شيء' : 'None'}</option>
+                    <option value="LOW">{lang === 'fr' ? 'Basse' : lang === 'ar' ? 'منخفضة' : 'Low'}</option>
+                    <option value="MEDIUM">{lang === 'fr' ? 'Moyenne' : lang === 'ar' ? 'متوسطة' : 'Medium'}</option>
+                    <option value="HIGH">{lang === 'fr' ? 'Haute' : lang === 'ar' ? 'عالية' : 'High'}</option>
+                  </select>
+                </div>
+
+                {/* Temperature Range */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      {lang === 'fr' ? 'Temp min (C°)' : lang === 'ar' ? 'درجة الحرارة الدنيا' : 'Min Temp (°C)'}
+                    </label>
+                    <input
+                      type="number"
+                      min="-50"
+                      max="80"
+                      value={requiredMinTemperatureC}
+                      onChange={(e) => {
+                        setRequiredMinTemperatureC(e.target.value)
+                        if (errors.temperature) setErrors({ ...errors, temperature: '' })
+                      }}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      {lang === 'fr' ? 'Temp max (C°)' : lang === 'ar' ? 'درجة الحرارة العليا' : 'Max Temp (°C)'}
+                    </label>
+                    <input
+                      type="number"
+                      min="-50"
+                      max="80"
+                      value={requiredMaxTemperatureC}
+                      onChange={(e) => {
+                        setRequiredMaxTemperatureC(e.target.value)
+                        if (errors.temperature) setErrors({ ...errors, temperature: '' })
+                      }}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+                {errors.temperature && <p className="text-sm text-red-500">{errors.temperature}</p>}
+
+                {/* Recommended Deposits */}
+                {recommendedDeposits.length > 0 && (
+                  <div className="mt-6">
+                    <div className="mb-4 flex gap-4 overflow-x-auto">
+                      {recommendedDeposits.map(deposit => {
+                        const fillPercent = Math.round((deposit.currentQuantity / deposit.capacity) * 100)
+                        return (
+                          <div
+                            key={deposit.id}
+                            className={`relative flex flex-col items-center p-3 rounded-lg shadow border transition-all cursor-pointer ${selectedDepositId === deposit.id ? 'border-primary-500 bg-primary-50 dark:bg-primary-900' : 'border-gray-200 bg-white dark:bg-gray-800'}`}
+                            style={{ minWidth: 220, zIndex: 10 }}
+                            onClick={() => setSelectedDepositId(deposit.id)}
+                          >
+                            <img src={deposit.containerImageUrl} alt={deposit.name} className="w-32 h-20 object-cover rounded mb-2" />
+                            <div className="w-full h-2 bg-gray-200 rounded mb-2">
+                              <div className="h-2 rounded bg-primary-500" style={{ width: `${fillPercent}%` }}></div>
+                            </div>
+                            <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{deposit.name}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{deposit.city} ({deposit.region})</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'fr' ? 'Remplissage' : lang === 'ar' ? 'مملوء' : 'Full'}: {fillPercent}%</div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      {lang === 'fr' ? 'Sélectionner un dépôt recommandé' : lang === 'ar' ? 'اختر مستودعاً موصى به' : 'Select a recommended deposit'}
+                    </label>
+                    <select
+                      value={selectedDepositId}
+                      onChange={e => setSelectedDepositId(e.target.value)}
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">{lang === 'fr' ? 'Sélectionner' : lang === 'ar' ? 'اختر' : 'Select'}</option>
+                      {recommendedDeposits.map(deposit => (
+                        <option key={deposit.id} value={deposit.id}>
+                          {deposit.name} ({deposit.city || 'N/A'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {recommendError && <p className="mt-4 text-sm text-red-500">{recommendError}</p>}
+              </div>
+            )}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex gap-3 pt-6 mt-6 border-t border-gray-200 dark:border-gray-700">
+            {currentStep > 0 && (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(prev => prev - 1)}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowLeftIcon />
+                {lang === 'fr' ? 'Précédent' : lang === 'ar' ? 'السابق' : 'Previous'}
+              </button>
+            )}
+            
+            {currentStep < steps.length - 1 ? (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(prev => prev + 1)}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center gap-2"
+              >
+                {lang === 'fr' ? 'Suivant' : lang === 'ar' ? 'التالي' : 'Next'}
+                <ArrowRightIcon />
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  disabled={recommendLoading || recommendedDeposits.length > 0}
+                  className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={async () => {
+                    setRecommendLoading(true)
+                    setRecommendError('')
+                    try {
+                      const dto = {
+                        quantity: Number(quantity),
+                        requiredHumidityLevel: requiredHumidityLevel || undefined,
+                        requiredMinTemperatureC: requiredMinTemperatureC ? Number(requiredMinTemperatureC) : undefined,
+                        requiredMaxTemperatureC: requiredMaxTemperatureC ? Number(requiredMaxTemperatureC) : undefined,
+                        requiredCapabilities: requiresRefrigeration ? ['refrigeration'] : undefined,
+                      }
+                      const response = await axiosInstance.post('/deposits/recommend', dto)
+                      setRecommendedDeposits(response.data)
+                    } catch (err) {
+                      setRecommendError('Failed to recommend deposits')
+                    } finally {
+                      setRecommendLoading(false)
+                    }
+                  }}
+                >
+                  {recommendLoading ? (lang === 'fr' ? 'Recherche...' : lang === 'ar' ? 'جاري البحث...' : 'Getting deposits...') : (lang === 'fr' ? 'Obtenir dépôts' : lang === 'ar' ? 'الحصول على المستودعات' : 'Get Deposits')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting || recommendLoading || !recommendedDeposits.length}
+                  className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <CheckCircleIcon />
+                  {submitting
+                    ? lang === 'fr' ? 'Envoi...' : lang === 'ar' ? 'إرسال...' : 'Submitting...'
+                    : isEditing
+                      ? lang === 'fr' ? 'Mettre à jour' : lang === 'ar' ? 'تحديث' : 'Update'
+                      : lang === 'fr' ? 'Créer' : lang === 'ar' ? 'إنشاء' : 'Create'}
+                </button>
+              </>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   )
 }
 
 export default CreateEditAidPage
+
+/**
+ * Download PDF Component
+ * Provides PDF download functionality for donation certificates
+ */
+
+import { pdfService, type DonationPDFData } from '@core/services/pdf.service'
+import { Button } from '@components/Button'
+
+export interface DownloadDonationPDFProps {
+  data: DonationPDFData | null
+  label?: string
+  className?: string
+}
+
+export const DEFAULT_ORGANIZATION = {
+  name: 'OMNIA Charity',
+  address: 'Tunis, Tunisia',
+  phone: '+216 XX XXX XXX',
+  email: 'contact@omnia.org',
+  logoUrl: '/assets/logo.png',
+}
+
+export const buildDonationPDFData = (params: {
+  donor: { name: string; email?: string }
+  visit: { id: string; name: string; date: Date; location: string; region?: string }
+  family: { name: string; address?: string; members?: number }
+  aids: Array<{ name: string; type: string; quantity: number; unit?: string }>
+  notes?: string
+  signedBy?: string
+}): DonationPDFData => {
+  const { donor, visit, family, aids, notes, signedBy } = params
+  
+  return {
+    certificateNumber: `CERT-${visit.id}-${Date.now()}`,
+    generatedAt: new Date(),
+    organization: DEFAULT_ORGANIZATION,
+    donor: {
+      name: donor.name,
+      email: donor.email,
+    },
+    visit: {
+      id: visit.id,
+      name: visit.name,
+      date: visit.date,
+      location: visit.location,
+      region: visit.region,
+    },
+    beneficiary: {
+      familyId: visit.id,
+      lastName: family.name,
+      address: family.address,
+      numberOfMembers: family.members || 1,
+    },
+    aids: aids.map(aid => ({
+      name: aid.name,
+      type: aid.type,
+      quantity: aid.quantity,
+      unit: aid.unit || 'unit',
+    })),
+    notes,
+    signedBy: signedBy || donor.name,
+  }
+}
+
+export const DownloadDonationPDF: React.FC<DownloadDonationPDFProps> = ({
+  data,
+  label = 'Download PDF',
+  className = '',
+}) => {
+  const handleDownload = () => {
+    if (!data) return
+    pdfService.generateDonationCertificate(data)
+  }
+
+  return (
+    <Button
+      onClick={handleDownload}
+      disabled={!data}
+      className={className}
+      variant="primary"
+    >
+      {label}
+    </Button>
+  )
+}
+
+export type { DonationPDFData }
