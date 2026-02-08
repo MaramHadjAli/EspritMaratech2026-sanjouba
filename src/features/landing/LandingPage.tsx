@@ -401,6 +401,19 @@ const LandingPage: React.FC = () => {
                   <p className="text-gray-600 dark:text-gray-400">{t('landing.contact.address')}</p>
                 </div>
               </div>
+              {/* Donation Section */}
+              <div className="flex items-center gap-4 p-5 rounded-2xl bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-700 mt-6">
+                <div className="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">💖</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Feel like donating?</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-2">Support renovation of Ecole Sidi Selem Sejnan.</p>
+                  <a href="https://www.cha9a9a.tn/fund/detail/renovation-ecole-sidi-selem-sejnan-562974" target="_blank" rel="noopener noreferrer">
+                    <Button className="!bg-rose-600 !text-white !py-2 !px-6 !rounded-lg hover:!bg-rose-700 transition">Donate Now</Button>
+                  </a>
+                </div>
+              </div>
             </div>
 
             <form onSubmit={(e) => { e.preventDefault() }} className="space-y-5 p-6 sm:p-8 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
