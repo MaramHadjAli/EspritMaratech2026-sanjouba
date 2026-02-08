@@ -15,6 +15,7 @@ import { Card } from '@components/Card'
 import { FormField } from '@components/FormField'
 import { Button } from '@components/Button'
 import { Spinner } from '@components/Spinner'
+import { useOffline } from '@hooks/useOffline'
 import type { CreateVisitData } from '@/shared/types'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -30,6 +31,7 @@ const CreateEditVisitPage: React.FC = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { success, error: showError } = useToast()
+  const { isOffline, queueAction } = useOffline()
 
   // State management
   const [submitting, setSubmitting] = useState(false)
@@ -177,6 +179,24 @@ const CreateEditVisitPage: React.FC = () => {
         userIds: selectedUsers.map((u) => u.id),
       }
 
+      // ── OFFLINE MODE ──
+      if (isOffline) {
+        await queueAction({
+          type: 'CREATE_VISIT',
+          endpoint: '/visit',
+          method: 'POST',
+          payload: submitData,
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+          label: `Visit: ${data.startDate || new Date().toLocaleDateString()}`,
+        })
+        success('Saved offline — will sync when back online')
+        navigate('/visits')
+        return
+      }
+
+      // ── ONLINE MODE ──
       if (isEditing) {
         const response = await visitService.updateVisit(id!, submitData)
         if (response.success || response.data) {
@@ -199,8 +219,30 @@ const CreateEditVisitPage: React.FC = () => {
         }
       }
     } catch (err) {
-      showError('An error occurred')
-      console.error(err)
+      // If network fails mid-submit, queue offline
+      if (!navigator.onLine) {
+        const submitData: CreateVisitData = {
+          ...data,
+          latitude: latitude,
+          longitude: longitude,
+          userIds: selectedUsers.map((u) => u.id),
+        }
+        await queueAction({
+          type: 'CREATE_VISIT',
+          endpoint: '/visit',
+          method: 'POST',
+          payload: submitData,
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+          label: `Visit: ${data.startDate || new Date().toLocaleDateString()}`,
+        })
+        success('Connection lost — saved offline')
+        navigate('/visits')
+      } else {
+        showError('An error occurred')
+        console.error(err)
+      }
     } finally {
       setSubmitting(false)
     }
@@ -297,10 +339,12 @@ const CreateEditVisitPage: React.FC = () => {
                 Click on the map to select the visit location
               </p>
 
-              <div
-                id="visit-map"
-                className="w-full h-96 rounded-lg border border-gray-300 dark:border-gray-600"
-              />
+              <div className="relative overflow-hidden">
+                <div
+                  id="visit-map"
+                  className="w-full h-96 rounded-lg border border-gray-300 dark:border-gray-600"
+                />
+              </div>
 
               <div className="grid md:grid-cols-2 gap-4 pt-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
                 <div>

@@ -560,10 +560,15 @@ const ConfigurableDashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Analytics Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {isEditMode
-                ? 'Drag and drop charts to rearrange. Click the eye icon to show/hide charts.'
-                : 'Charts and analytics from live dashboard endpoints'}
+            <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+              {isEditMode ? (
+                'Drag and drop charts to rearrange. Click the eye icon to show/hide charts.'
+              ) : (
+                <>
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Live insights from real-time data endpoints
+                </>
+              )}
             </p>
           </div>
         </div>

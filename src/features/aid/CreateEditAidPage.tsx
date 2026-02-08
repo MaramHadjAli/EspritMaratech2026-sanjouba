@@ -16,6 +16,7 @@ import { familyService } from '@services/family.service'
 import { Button } from '@components/Button'
 import { StepProgressBar, Step } from '@components/StepProgressBar'
 import Header from '@components/Header'
+import { useOffline } from '@hooks/useOffline'
 
 // ---------- SVG Icons for visual polish ----------
 const PhoneIcon = () => (
@@ -155,6 +156,7 @@ const CreateEditAidPage: React.FC = () => {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const { success, error: showError } = useToast()
+  const { isOffline, queueAction } = useOffline()
 
   const [currentStep, setCurrentStep] = useState(0)
   const [submitting, setSubmitting] = useState(false)
@@ -185,11 +187,11 @@ const CreateEditAidPage: React.FC = () => {
   const steps: Step[] = [
     { 
       label: lang === 'fr' ? 'Identification' : lang === 'ar' ? 'التعريف' : 'Identification',
-      description: lang === 'fr' ? 'Infos de contact' : lang === 'ar' ? 'معلومات الاتصال' : 'Contact info'
+      description: lang === 'fr' ? 'Infos de contact' : lang === 'ar' ? 'المعلومات الاتصال' : 'Contact info'
     },
     { 
       label: lang === 'fr' ? 'Détails' : lang === 'ar' ? 'التفاصيل' : 'Details',
-      description: lang === 'fr' ? 'Infos famille' : lang === 'ar' ? 'معلومات العائلة' : 'Family info'
+      description: lang === 'fr' ? 'Infos famille' : lang === 'ar' ? 'المعلومات العائلة' : 'Family info'
     },
     { 
       label: lang === 'fr' ? 'Aide' : lang === 'ar' ? 'المساعدة' : 'Aid',
@@ -253,22 +255,52 @@ const CreateEditAidPage: React.FC = () => {
         notes: notes || undefined,
       }
 
-      let familyId = ''
-      try {
-        const familyRes = await familyService.createFamily(familyPayload)
-        familyId = familyRes?.data?.id || familyRes?.id || ''
-      } catch {
-        // If family creation fails, still try to create aid without familyId
-      }
-
       // 2. Create aid
       const aidPayload = {
-        familyId,
+        familyId: '',
         type: aidType,
         quantity: Number(quantity),
         unit: 'unit',
         description: notes || undefined,
       }
+
+      // ── OFFLINE MODE ──
+      if (isOffline) {
+        await queueAction({
+          type: 'CREATE_FAMILY',
+          endpoint: '/family',
+          method: 'POST',
+          payload: familyPayload,
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+          label: `${lang === 'fr' ? 'Famille' : 'Family'}: ${lastName}`,
+        })
+        await queueAction({
+          type: 'CREATE_AID',
+          endpoint: '/aids',
+          method: 'POST',
+          payload: aidPayload,
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+          label: `${lang === 'fr' ? 'Aide' : 'Aid'}: ${aidType} - ${lastName}`,
+        })
+        success(lang === 'fr' ? 'Sauvegardé hors ligne — sera envoyé au retour du réseau' : lang === 'ar' ? 'تم الحفظ بدون اتصال — سيتم الإرسال عند عودة الشبكة' : 'Saved offline — will sync when back online')
+        navigate('/home')
+        return
+      }
+
+      // ── ONLINE MODE ──
+      let familyId = ''
+      try {
+        const familyRes = await familyService.createFamily(familyPayload)
+        familyId = familyRes?.data?.id || (familyRes as any)?.id || ''
+      } catch {
+        // If family creation fails, still try to create aid without familyId
+      }
+
+      aidPayload.familyId = familyId
 
       if (isEditing) {
         const response = await aidService.updateAid(id!, aidPayload)
@@ -288,7 +320,54 @@ const CreateEditAidPage: React.FC = () => {
         }
       }
     } catch (err) {
-      showError(lang === 'fr' ? 'Une erreur est survenue' : lang === 'ar' ? 'حدث خطأ' : 'An error occurred')
+      // If network fails mid-submit, queue it offline
+      // Note: Deduplication in offlineStorage prevents double queuing
+      if (!navigator.onLine) {
+        const familyPayload = {
+          name: lastName,
+          phoneNumber: phone,
+          address: address || location,
+          familySize: numberOfMembers ? parseInt(numberOfMembers) : 1,
+          categoryPhotos: {
+            schoolChildren: hasStudent,
+            student: hasStudent,
+            elderly: hasElderly,
+          },
+          notes: notes || undefined,
+        }
+        const aidPayload = {
+          familyId: '',
+          type: aidType,
+          quantity: Number(quantity),
+          unit: 'unit',
+          description: notes || undefined,
+        }
+        // Queue both family and aid (deduplication handles if already queued)
+        await queueAction({
+          type: 'CREATE_FAMILY',
+          endpoint: '/family',
+          method: 'POST',
+          payload: familyPayload,
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+          label: `${lang === 'fr' ? 'Famille' : 'Family'}: ${lastName}`,
+        })
+        await queueAction({
+          type: 'CREATE_AID',
+          endpoint: '/aids',
+          method: 'POST',
+          payload: aidPayload,
+          createdAt: new Date().toISOString(),
+          retries: 0,
+          status: 'pending',
+          label: `${lang === 'fr' ? 'Aide' : 'Aid'}: ${aidType} - ${lastName}`,
+        })
+        success(lang === 'fr' ? 'Connexion perdue — sauvegardé hors ligne' : 'Connection lost — saved offline')
+        navigate('/home')
+      } else {
+        showError(lang === 'fr' ? 'Une erreur est survenue' : lang === 'ar' ? 'حدث خطأ' : 'An error occurred')
+      }
     } finally {
       setSubmitting(false)
     }
@@ -345,7 +424,7 @@ const CreateEditAidPage: React.FC = () => {
                       <UserIcon />
                     </div>
                     <h2 className="text-lg font-bold text-gray-800 dark:text-white">
-                      {lang === 'fr' ? 'Informations de contact' : lang === 'ar' ? 'معلومات الاتصال' : 'Contact Information'}
+                      {lang === 'fr' ? 'Informations de contact' : lang === 'ar' ? 'المعلومات الاتصال' : 'Contact Information'}
                     </h2>
                   </div>
 
