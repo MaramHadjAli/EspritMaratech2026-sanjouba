@@ -144,7 +144,6 @@ const CreateAidDistributionModal: React.FC<CreateAidDistributionModalProps> = ({
         const families = response?.data ?? response
         setSearchResults(Array.isArray(families) ? families : [])
       } catch (err) {
-        error('Failed to search families')
         console.error(err)
         setSearchResults([])
       } finally {

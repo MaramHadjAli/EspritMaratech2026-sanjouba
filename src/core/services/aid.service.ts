@@ -110,4 +110,20 @@ export const aidService = {
     })
     return response.data
   },
+
+  /**
+   * Get all deposits
+   */
+  getAllDeposits: async (): Promise<ApiResponse<any[]>> => {
+    const response = await axiosInstance.get('/deposits')
+    return response.data
+  },
+
+  /**
+   * Get single deposit by ID
+   */
+  getDepositById: async (id: string): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.get(`/deposits/${id}`)
+    return response.data
+  },
 }

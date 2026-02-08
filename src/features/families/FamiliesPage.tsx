@@ -1,6 +1,6 @@
 /**
  * Families Page
- * Manage family records with CRUD operations
+ * Search and manage family records with CRUD operations
  */
 
 import React, { useState, useEffect } from 'react'
@@ -8,10 +8,12 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useToast } from '@hooks/useNotification'
+import { useDebounce } from '@hooks/useDebounce'
 import { Button } from '@components/Button'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Spinner } from '@components/Spinner'
+import { AccessibleModal } from '@components/AccessibleModal'
 import { familyService } from '@core/services/family.service'
 import { Family } from '@types'
 
@@ -21,162 +23,295 @@ const FamiliesPage: React.FC = () => {
   const { user } = useAuth()
   const toast = useToast()
 
-  const [loading, setLoading] = useState(true)
-  const [families, setFamilies] = useState<Family[]>([])
+  const [searchType, setSearchType] = useState<'phone' | 'lastname'>('phone')
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterRegion, setFilterRegion] = useState<string>('all')
+  const [searchResults, setSearchResults] = useState<Family[]>([])
+  const [loading, setLoading] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000)
 
   useEffect(() => {
     if (!user) {
       navigate('/login')
       return
     }
+  }, [user, navigate])
 
-    const fetchFamilies = async () => {
+  useEffect(() => {
+    if (!debouncedSearchTerm.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    const performSearch = async () => {
       try {
         setLoading(true)
-        const response = await familyService.getAllFamilies(1, 50, {})
-        setFamilies(response.data?.items || [])
+        let response: any
+
+        if (searchType === 'phone') {
+          response = await familyService.searchByPhone(debouncedSearchTerm)
+        } else {
+          response = await familyService.searchByLastName(debouncedSearchTerm)
+        }
+
+        console.log('Search response:', response)
+
+        // Handle different response formats
+        let results = []
+        if (Array.isArray(response)) {
+          // Response is directly an array
+          results = response
+        } else if (Array.isArray(response.data)) {
+          // Response is ApiResponse<Array>
+          results = response.data
+        } else if (response.data?.items && Array.isArray(response.data.items)) {
+          // Response is ApiResponse<{ items: Array }>
+          results = response.data.items
+        }
+
+        console.log('Parsed results:', results)
+
+        // Map response to Family type - handle different field names
+        const mappedResults = results.map((item: any) => ({
+          ...item,
+          name: item.name || item.lastName,
+          headOfFamily: item.headOfFamily || item.lastName,
+          phoneNumber: item.phoneNumber || item.phone,
+          familySize: item.familySize || item.numberOfMembers || 1,
+        }))
+
+        console.log('Mapped results:', mappedResults)
+        setSearchResults(mappedResults)
       } catch (error) {
-        console.error('Failed to fetch families:', error)
-        toast.error('Failed to load families')
+        console.error('Search error:', error)
+        setSearchResults([])
       } finally {
         setLoading(false)
       }
     }
 
-    fetchFamilies()
-  }, [user, navigate, toast])
+    performSearch()
+  }, [debouncedSearchTerm, searchType])
 
-  const filteredFamilies = families.filter((family) => {
-    const matchesSearch = family.headOfFamily?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         family.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
-  })
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteConfirm({ id, name })
+  }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <Spinner size="lg" label={t('common.loading') || 'Loading...'} />
-      </div>
-    )
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirm) return
+
+    try {
+      setDeleting(deleteConfirm.id)
+      const response = await familyService.deleteFamily(deleteConfirm.id)
+
+      if (response.success) {
+        toast.success('Family deleted successfully')
+        setSearchResults((prev) => prev.filter((f) => f.id !== deleteConfirm.id))
+        setDeleteConfirm(null)
+      } else {
+        toast.error('Failed to delete family')
+      }
+    } catch (error) {
+      console.error('Error deleting family:', error)
+      toast.error('An error occurred while deleting the family')
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  if (!user) {
+    return null
   }
 
   return (
     <div className="py-8">
-          {/* Header */}
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Families
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Manage and track all family records
-              </p>
-            </div>
-            <Button onClick={() => navigate('/families/add')}>
-              Add New Family
-            </Button>
+      {/* Header */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Families
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Search families to manage their information
+          </p>
+        </div>
+        <Button onClick={() => navigate('/families/add')}>
+          Create New Family
+        </Button>
+      </div>
+
+      {/* Search Card */}
+      <Card bordered className="p-6 mb-6">
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setSearchType('phone')
+                setSearchTerm('')
+                setSearchResults([])
+              }}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                searchType === 'phone'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+              }`}
+            >
+              Search by Phone
+            </button>
+            <button
+              onClick={() => {
+                setSearchType('lastname')
+                setSearchTerm('')
+                setSearchResults([])
+              }}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                searchType === 'lastname'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+              }`}
+            >
+              Search by Last Name
+            </button>
           </div>
 
-          {/* Search & Filter */}
-          <Card bordered className="p-6 mb-6">
-            <div className="grid md:grid-cols-3 gap-4">
-              <input
-                type="text"
-                placeholder="Search families..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              />
-              <select
-                value={filterRegion}
-                onChange={(e) => setFilterRegion(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              >
-                <option value="all">All Regions</option>
-                <option value="north">North</option>
-                <option value="south">South</option>
-                <option value="east">East</option>
-                <option value="west">West</option>
-                <option value="center">Center</option>
-              </select>
-              <Button variant="ghost" onClick={() => {
-                setSearchTerm('')
-                setFilterRegion('all')
-              }}>
-                Clear Filters
-              </Button>
-            </div>
-          </Card>
-
-          {/* Families List */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFamilies.length === 0 ? (
-              <Card bordered className="p-12 text-center md:col-span-2 lg:col-span-3">
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {searchTerm || filterRegion !== 'all' ? 'No families found' : 'No families yet'}
-                </p>
-                <Button onClick={() => navigate('/families/add')}>
-                  Add First Family
-                </Button>
-              </Card>
-            ) : (
-              filteredFamilies.map((family) => (
-                <Card
-                  key={family.id}
-                  bordered
-                  className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/families/${family.id}`)}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {family.headOfFamily}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {family.familySize} members
-                      </p>
-                    </div>
-                    <Badge variant="info">
-                      Size: {family.numberOfMembers}
-                    </Badge>
-                  </div>
-
-                  <p className="text-gray-600 dark:text-gray-400">
-                    📍 {family.address}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    📱 {family.phoneNumber}
-                  </p>
-
-                  <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        navigate(`/families/${family.id}/edit`)
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-danger"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        // TODO: Delete family
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </Card>
-              ))
+          <div className="relative">
+            <input
+              type="text"
+              placeholder={
+                searchType === 'phone'
+                  ? 'Enter phone number (e.g., +216 99 999 999)'
+                  : 'Enter last name...'
+              }
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+            {loading && (
+              <div className="absolute right-4 top-2.5">
+                <Spinner size="sm" />
+              </div>
             )}
           </div>
+
+          {searchTerm && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {loading ? 'Searching...' : `Found ${searchResults.length} result${searchResults.length !== 1 ? 's' : ''}`}
+            </p>
+          )}
+        </div>
+      </Card>
+
+      {/* Search Results */}
+      {searchTerm && (
+        <div className="space-y-4">
+          {searchResults.length === 0 && !loading ? (
+            <Card bordered className="p-12 text-center">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                No families found matching your search
+              </p>
+              <Button onClick={() => navigate('/families/add')}>
+                Create New Family
+              </Button>
+            </Card>
+          ) : (
+            searchResults.map((family) => (
+              <Card
+                key={family.id}
+                bordered
+                className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => navigate(`/families/${family.id}/edit`)}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {family.headOfFamily || family.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      {family.familySize || family.numberOfMembers} members
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 mt-2">
+                      📱 {family.phoneNumber}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      📍 {family.address}
+                    </p>
+                  </div>
+                  <Badge variant="info" className="ml-4">
+                    Size: {family.numberOfMembers}
+                  </Badge>
+                </div>
+
+                <div className="flex gap-2 pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      navigate(`/families/${family.id}/edit`)
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-danger"
+                    disabled={deleting === family.id}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteClick(family.id, family.headOfFamily || family.name || 'Family')
+                    }}
+                  >
+                    {deleting === family.id ? 'Deleting...' : 'Delete'}
+                  </Button>
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Welcome Message */}
+      {!searchTerm && (
+        <Card bordered className="p-12 text-center">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Search for a family by phone number or last name to get started
+          </p>
+          <Button onClick={() => navigate('/families/add')}>
+            Or Create a New Family
+          </Button>
+        </Card>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <AccessibleModal
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        title="Delete Family"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700 dark:text-gray-300">
+            Are you sure you want to delete <strong>{deleteConfirm?.name}</strong>? This action cannot be undone.
+          </p>
+          <div className="flex gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setDeleteConfirm(null)}
+              disabled={deleting !== null}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleConfirmDelete}
+              disabled={deleting !== null}
+            >
+              {deleting ? 'Deleting...' : 'Delete Family'}
+            </Button>
+          </div>
+        </div>
+      </AccessibleModal>
     </div>
   )
 }

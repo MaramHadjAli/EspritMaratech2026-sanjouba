@@ -110,4 +110,20 @@ export const familyService = {
     const response = await axiosInstance.get('/family/needs/catalog/list')
     return response.data
   },
+
+  /**
+   * Get family needs
+   */
+  getFamilyNeeds: async (familyId: string): Promise<ApiResponse<any[]>> => {
+    const response = await axiosInstance.get(`/family/${familyId}/needs`)
+    return response.data
+  },
+
+  /**
+   * Update/Upsert family needs
+   */
+  upsertFamilyNeeds: async (familyId: string, needs: any[]): Promise<ApiResponse<any>> => {
+    const response = await axiosInstance.patch(`/family/${familyId}/needs`, { needs })
+    return response.data
+  },
 }
