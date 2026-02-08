@@ -160,10 +160,10 @@ const Header: React.FC = () => {
             {/* User Name Badge */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full">
               <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold uppercase">
-                {user?.name?.charAt(0) || user?.fullName?.charAt(0) || 'U'}
+                {user?.name?.charAt(0) || user?.name?.charAt(0) || 'U'}
               </div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-24 truncate">
-                {user?.name || user?.fullName || 'User'}
+                {user?.name || user?.name || 'User'}
               </span>
             </div>
 
@@ -219,7 +219,7 @@ const Header: React.FC = () => {
                   {user?.name?.charAt(0) || 'U'}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name || user?.fullName}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name || user?.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role?.toLowerCase()}</p>
                 </div>
               </div>

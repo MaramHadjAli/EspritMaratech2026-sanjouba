@@ -19,14 +19,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isRestoring, setIsRestoring] = useState(!!localStorage.getItem('authToken'))
   const isRestorationAttemptedRef = useRef(false)
 
+  const normalizeUser = (rawUser: any): User | null => {
+    if (!rawUser) return null
+    const normalized = { ...rawUser }
+    const derivedName =
+      normalized.name ||
+      normalized.fullName ||
+      [normalized.firstName, normalized.lastName].filter(Boolean).join(' ') ||
+      (normalized.email ? normalized.email.split('@')[0] : undefined)
+
+    if (derivedName && !normalized.name) {
+      normalized.name = derivedName
+    }
+
+    return normalized as User
+  }
+
   useEffect(() => {
     // Restore auth state from localStorage
     const storedToken = localStorage.getItem('authToken')
     const storedUser = localStorage.getItem('authUser')
     if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
-      console.log('🔐 [AuthContext] Restored from localStorage')
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        const normalizedUser = normalizeUser(parsedUser)
+        if (normalizedUser) {
+          setToken(storedToken)
+          setUser(normalizedUser)
+          localStorage.setItem('authUser', JSON.stringify(normalizedUser))
+          console.log('🔐 [AuthContext] Restored from localStorage')
+        }
+      } catch (error) {
+        console.error('❌ [AuthContext] Failed to parse stored user:', error)
+        localStorage.removeItem('authUser')
+      }
     }
   }, [])
 
@@ -41,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const response = await authService.getCurrentUser()
         const payload = response.data ?? response
-        const resolvedUser = (payload as any)?.user ?? payload
+        const resolvedUser = normalizeUser(payload)
 
         if (resolvedUser) {
           setUser(resolvedUser)
@@ -78,12 +104,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await authService.login(email, password)
       console.log('🔐 [AuthContext] Login response received:', { 
         hasToken: !!response.token, 
-        hasUser: !!response.user,
-        user: response.user 
+        hasUser: !!response.user
       })
       
+      // Store token in localStorage first
       setToken(response.token)
-      setUser(response.user)
+      
+      // Fetch full user data from getCurrentUser endpoint
+      const userResponse = await authService.getCurrentUser()
+      const fullUserData = (userResponse as any)?.data ?? userResponse
+      const normalizedUser = normalizeUser(fullUserData)
+      
+      setUser(normalizedUser)
+      if (normalizedUser) {
+        localStorage.setItem('authUser', JSON.stringify(normalizedUser))
+        console.log('🔐 [AuthContext] Stored full user data from getCurrentUser endpoint')
+      }
       
       console.log('🔐 [AuthContext] State updated - isAuthenticated should be true now')
       return response
@@ -99,8 +135,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true)
     try {
       const response = await authService.signup(data)
+      
+      // Store token in localStorage first
       setToken(response.token)
-      setUser(response.user)
+      
+      // Fetch full user data from getCurrentUser endpoint
+      const userResponse = await authService.getCurrentUser()
+      const fullUserData = (userResponse as any)?.data ?? userResponse
+      const normalizedUser = normalizeUser(fullUserData)
+      
+      setUser(normalizedUser)
+      if (normalizedUser) {
+        localStorage.setItem('authUser', JSON.stringify(normalizedUser))
+        console.log('🔐 [AuthContext] Stored full user data from getCurrentUser endpoint')
+      }
       return response
     } catch (error) {
       console.error('Signup failed:', error)

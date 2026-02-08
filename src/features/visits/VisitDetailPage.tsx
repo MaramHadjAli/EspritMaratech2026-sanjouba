@@ -18,14 +18,21 @@ import type { Visit } from '@/shared/types'
 const VisitDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, isRestoring } = useAuth()
   const { success, error } = useToast()
   const [visit, setVisit] = useState<Visit | null>(null)
   const [loading, setLoading] = useState(true)
   const [aidModalOpen, setAidModalOpen] = useState(false)
 
   useEffect(() => {
+    // Wait until auth is done restoring from localStorage
+    if (isRestoring) {
+      console.log('⏳ VisitDetailPage - Waiting for auth to restore...')
+      return
+    }
+
     if (!user) {
+      console.log('❌ VisitDetailPage - No user, redirecting to login')
       navigate('/login')
       return
     }
@@ -35,6 +42,10 @@ const VisitDetailPage: React.FC = () => {
         setLoading(true)
         const response = await visitService.getVisitById(id as string)
         const resolvedVisit = (response as any)?.data ?? response
+        console.log('📍 VisitDetailPage - Fetched visit:', resolvedVisit)
+        console.log('📍 VisitDetailPage - isActive:', resolvedVisit?.isActive)
+        console.log('📍 VisitDetailPage - users:', resolvedVisit?.users)
+        console.log('📍 VisitDetailPage - current user id:', user?.id)
         setVisit(resolvedVisit)
       } catch (err) {
         error('Error loading visit')
@@ -47,7 +58,7 @@ const VisitDetailPage: React.FC = () => {
     if (id) {
       fetchVisit()
     }
-  }, [id, user, navigate])
+  }, [id, user, navigate, isRestoring])
 
   const handleDelete = async () => {
     if (!visit || !confirm('Delete this visit?')) return
@@ -65,6 +76,21 @@ const VisitDetailPage: React.FC = () => {
     }
   }
 
+  const handleJoinVisit = async () => {
+    if (!visit) return
+    try {
+      await visitService.joinVisit(visit.id)
+      success('Successfully joined the visit')
+      // Refresh the visit data
+      const response = await visitService.getVisitById(visit.id)
+      const resolvedVisit = (response as any)?.data ?? response
+      setVisit(resolvedVisit)
+    } catch (err) {
+      console.error('Failed to join visit:', err)
+      error('Failed to join visit')
+    }
+  }
+
   if (loading) {
     return (
       <>
@@ -78,6 +104,7 @@ const VisitDetailPage: React.FC = () => {
   }
 
   if (!visit) {
+    console.log('❌ VisitDetailPage - Visit is null or undefined')
     return (
       <>
         <div className="py-8 px-4 sm:px-6 lg:px-8">
@@ -110,12 +137,28 @@ const VisitDetailPage: React.FC = () => {
               ← Back to Visits
             </button>
             <div className="flex gap-3">
-              <Button
-                onClick={() => setAidModalOpen(true)}
-                className="bg-success hover:bg-success-600"
-              >
-                Create Aid Distribution
-              </Button>
+              {(() => {
+                const isActive = visit.isActive
+                const isUserInTeam = visit.users?.some(u => u.id === user?.id)
+                console.log('🔘 Button render check:', { isActive, isUserInTeam })
+                
+                if (isActive && isUserInTeam) {
+                  return <Button
+                    onClick={() => setAidModalOpen(true)}
+                    className="bg-success hover:bg-success-600"
+                  >
+                    Create Aid Distribution
+                  </Button>
+                } else if (isActive && !isUserInTeam) {
+                  return <Button
+                    onClick={handleJoinVisit}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Join Visit
+                  </Button>
+                }
+                return null
+              })()}
               <Button
                 onClick={() => navigate(`/visits/${visit.id}/edit`)}
                 variant="ghost"
@@ -176,7 +219,7 @@ const VisitDetailPage: React.FC = () => {
                   End Date
                 </p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
-                  {new Date(visit.endDate).toLocaleDateString()}
+                  {visit.endDate ? new Date(visit.endDate).toLocaleDateString() : 'N/A'}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
@@ -184,7 +227,7 @@ const VisitDetailPage: React.FC = () => {
                   Duration
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {Math.ceil((new Date(visit.endDate).getTime() - new Date(visit.startDate).getTime()) / (1000 * 60 * 60 * 24))} days
+                  {visit.endDate ? `${Math.ceil((new Date(visit.endDate).getTime() - new Date(visit.startDate).getTime()) / (1000 * 60 * 60 * 24))} days` : 'N/A'}
                 </p>
               </div>
             </div>
