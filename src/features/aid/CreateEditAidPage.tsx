@@ -172,8 +172,6 @@ const CreateEditAidPage: React.FC = () => {
         requiredHumidityLevel: requiredHumidityLevel || undefined,
         requiredMinTemperatureC: requiredMinTemperatureC ? Number(requiredMinTemperatureC) : undefined,
         requiredMaxTemperatureC: requiredMaxTemperatureC ? Number(requiredMaxTemperatureC) : undefined,
-        familyId,
-        unit: aidType,
       }
       if (isEditing) {
         const response = await aidService.updateAid(id!, payload)
@@ -191,7 +189,7 @@ const CreateEditAidPage: React.FC = () => {
                 ? 'تم إنشاء المساعدة بنجاح'
                 : 'Aid created successfully'
           )
-          navigate('/aid')
+          navigate('/')
         }
       }
     } catch (err) {
@@ -436,18 +434,7 @@ const CreateEditAidPage: React.FC = () => {
             {errors.temperature && <p className="text-sm text-red-500">{errors.temperature}</p>}
 
             {/* Family selection */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                {lang === 'fr' ? 'Famille' : lang === 'ar' ? 'العائلة' : 'Family'} <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={familyId}
-                onChange={e => setFamilyId(e.target.value)}
-                placeholder={lang === 'fr' ? 'ID de la famille' : lang === 'ar' ? 'معرف العائلة' : 'Family ID'}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
+            
             <div className="flex gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
@@ -457,34 +444,82 @@ const CreateEditAidPage: React.FC = () => {
                 {lang === 'fr' ? 'Annuler' : lang === 'ar' ? 'إلغاء' : 'Cancel'}
               </button>
               <button
+                type="button"
+                disabled={recommendLoading || recommendedDeposits.length > 0}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={async () => {
+                  setRecommendLoading(true)
+                  setRecommendError('')
+                  try {
+                    const dto = {
+                      quantity: Number(quantity),
+                      requiredHumidityLevel: requiredHumidityLevel || undefined,
+                      requiredMinTemperatureC: requiredMinTemperatureC ? Number(requiredMinTemperatureC) : undefined,
+                      requiredMaxTemperatureC: requiredMaxTemperatureC ? Number(requiredMaxTemperatureC) : undefined,
+                      requiredCapabilities: requiresRefrigeration ? ['refrigeration'] : undefined,
+                    }
+                    const response = await axiosInstance.post('/deposits/recommend', dto)
+                    setRecommendedDeposits(response.data)
+                  } catch (err) {
+                    setRecommendError('Failed to recommend deposits')
+                  } finally {
+                    setRecommendLoading(false)
+                  }
+                }}
+              >
+                {recommendLoading ? (lang === 'fr' ? 'Recherche...' : lang === 'ar' ? 'جاري البحث...' : 'Getting deposits...') : (lang === 'fr' ? 'Obtenir dépôts' : lang === 'ar' ? 'الحصول على المستودعات' : 'Get Deposits')}
+              </button>
+              <button
                 type="submit"
-                disabled={submitting || recommendLoading}
+                disabled={submitting || recommendLoading || !recommendedDeposits.length}
                 className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {recommendLoading
-                  ? 'Recommending deposits...'
-                  : submitting
+                {submitting
+                  ? lang === 'fr'
+                    ? 'Envoi...'
+                    : lang === 'ar'
+                      ? 'إرسال...'
+                      : 'Submitting...'
+                  : isEditing
                     ? lang === 'fr'
-                      ? 'Envoi...'
+                      ? 'Mettre à jour'
                       : lang === 'ar'
-                        ? 'إرسال...'
-                        : 'Submitting...'
-                    : isEditing
-                      ? lang === 'fr'
-                        ? 'Mettre à jour'
-                        : lang === 'ar'
-                          ? 'تحديث'
-                          : 'Update'
-                      : lang === 'fr'
-                        ? 'Créer'
-                        : lang === 'ar'
-                          ? 'إنشاء'
-                          : 'Create'}
+                        ? 'تحديث'
+                        : 'Update'
+                    : lang === 'fr'
+                      ? 'Créer'
+                      : lang === 'ar'
+                        ? 'إنشاء'
+                        : 'Create'}
               </button>
             </div>
             {recommendError && <p className="mt-4 text-sm text-red-500">{recommendError}</p>}
             {recommendedDeposits.length > 0 && (
               <div className="mt-6">
+                <div className="mb-4 flex gap-4 overflow-x-auto">
+                  {recommendedDeposits.map(deposit => {
+                    const fillPercent = Math.round((deposit.currentQuantity / deposit.capacity) * 100)
+                    return (
+                      <div
+                        key={deposit.id}
+                        className={`relative flex flex-col items-center p-3 rounded-lg shadow border transition-all cursor-pointer ${selectedDepositId === deposit.id ? 'border-primary-500 bg-primary-50 dark:bg-primary-900' : 'border-gray-200 bg-white dark:bg-gray-800'}`}
+                        style={{ minWidth: 220, zIndex: 10 }}
+                        onClick={() => setSelectedDepositId(deposit.id)}
+                      >
+                        <img src={deposit.containerImageUrl} alt={deposit.name} className="w-32 h-20 object-cover rounded mb-2" />
+                        <div className="w-full h-2 bg-gray-200 rounded mb-2">
+                          <div
+                            className="h-2 rounded bg-primary-500"
+                            style={{ width: `${fillPercent}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{deposit.name}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{deposit.city} ({deposit.region})</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{lang === 'fr' ? 'Remplissage' : lang === 'ar' ? 'مملوء' : 'Full'}: {fillPercent}%</div>
+                      </div>
+                    )
+                  })}
+                </div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   {lang === 'fr' ? 'Sélectionner un dépôt recommandé' : lang === 'ar' ? 'اختر مستودعاً موصى به' : 'Select a recommended deposit'}
                 </label>

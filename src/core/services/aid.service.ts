@@ -11,7 +11,7 @@ export const aidService = {
    * Get all aids with pagination
    */
   getAllAids: async (page = 1, limit = 20): Promise<ApiResponse<PaginatedResponse<Aid>>> => {
-    const response = await axiosInstance.get('/aids', {
+    const response = await axiosInstance.get('/aid', {
       params: { page, limit },
     })
     return response.data
@@ -21,7 +21,7 @@ export const aidService = {
    * Get aids for specific family
    */
   getAidsByFamily: async (familyId: string): Promise<ApiResponse<Aid[]>> => {
-    const response = await axiosInstance.get(`/aids/family/${familyId}`)
+    const response = await axiosInstance.get(`/aid/family/${familyId}`)
     return response.data
   },
 
@@ -29,7 +29,7 @@ export const aidService = {
    * Get aids for specific visit
    */
   getAidsByVisit: async (visitId: string): Promise<ApiResponse<Aid[]>> => {
-    const response = await axiosInstance.get(`/aids/visit/${visitId}`)
+    const response = await axiosInstance.get(`/aid/visit/${visitId}`)
     return response.data
   },
 
@@ -37,7 +37,7 @@ export const aidService = {
    * Get single aid by ID
    */
   getAidById: async (id: string): Promise<ApiResponse<Aid>> => {
-    const response = await axiosInstance.get(`/aids/${id}`)
+    const response = await axiosInstance.get(`/aid/${id}`)
     return response.data
   },
 
@@ -45,7 +45,8 @@ export const aidService = {
    * Create new aid record
    */
   createAid: async (data: AddAidData): Promise<ApiResponse<Aid>> => {
-    const response = await axiosInstance.post('/aids', data)
+    const response = await axiosInstance.post('/aid', data)
+    console.log('Created aid:', response, data);
     return response.data
   },
 
@@ -53,7 +54,7 @@ export const aidService = {
    * Update existing aid
    */
   updateAid: async (id: string, data: Partial<AddAidData>): Promise<ApiResponse<Aid>> => {
-    const response = await axiosInstance.patch(`/aids/${id}`, data)
+    const response = await axiosInstance.patch(`/aid/${id}`, data)
     return response.data
   },
 

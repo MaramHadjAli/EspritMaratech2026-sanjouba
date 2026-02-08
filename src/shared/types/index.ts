@@ -280,12 +280,12 @@ export interface Medicine {
 }
 
 export interface AddAidData {
-  familyId: string
+  familyId?: string
   visitId?: string
   type: AidType | string
   items?: { name: string; quantity: number }[]
   quantity: number
-  unit: string
+  unit?: string
   description?: string
   weight?: number
 }

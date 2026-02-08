@@ -1,3 +1,15 @@
+// DTO for creating aid, matching backend
+export interface AddAidData {
+    name: string;
+    type: string;
+    description?: string;
+    quantity: number;
+    depositId: string;
+    requiresRefrigeration?: boolean;
+    requiredHumidityLevel?: string | null;
+    requiredMinTemperatureC?: number | null;
+    requiredMaxTemperatureC?: number | null;
+}
 // Aid interface for aid management
 export interface Aid {
     id: string;
