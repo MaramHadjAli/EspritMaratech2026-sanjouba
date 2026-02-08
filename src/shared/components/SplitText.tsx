@@ -139,7 +139,7 @@ export const WelcomeText: React.FC<WelcomeTextProps> = ({
       />
       <SplitText 
         text={name}
-        className="text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent"
+        className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary-600 dark:text-primary-400"
         delay={1.2}
         duration={0.7}
         stagger={0.1}

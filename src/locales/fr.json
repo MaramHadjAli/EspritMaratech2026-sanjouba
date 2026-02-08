@@ -154,17 +154,49 @@
   },
   "landing": {
     "hero": {
+      "badge": "Plateforme de Gestion d'Aide Caritative",
       "title": "OMNIA - Unis pour Aider",
-      "subtitle": "Une plateforme complète pour suivre et gérer l'aide caritative",
-      "cta": "Commencer"
+      "titlePart1": "Ensemble, bâtissons la solidarité avec",
+      "subtitle": "Suivez les visites, distribuez l'aide, gérez les familles et mesurez l'impact de vos actions caritatives — le tout sur une seule plateforme.",
+      "cta": "Commencer",
+      "signIn": "Se Connecter"
     },
     "about": {
       "title": "À Propos d'OMNIA",
-      "description": "OMNIA est une plateforme dédiée au suivi et à la gestion de l'aide caritative. Notre mission est de faciliter la distribution de l'aide et d'améliorer la transparence du travail caritatif."
+      "description": "OMNIA est une plateforme complète conçue pour les organisations caritatives. Nous permettons le suivi transparent de l'aide, la coordination des visites terrain, la gestion des besoins des familles et le suivi d'impact en temps réel.",
+      "mission": "Notre mission est de digitaliser et optimiser le travail caritatif pour garantir que chaque aide atteigne ceux qui en ont le plus besoin."
+    },
+    "features": {
+      "title": "Fonctionnalités Clés",
+      "subtitle": "Tout ce dont vous avez besoin pour gérer vos activités caritatives",
+      "visitTracking": "Suivi des Visites",
+      "visitTrackingDesc": "Planifiez, programmez et suivez les visites terrain avec géolocalisation et assignation d'équipes.",
+      "aidDistribution": "Distribution d'Aide",
+      "aidDistributionDesc": "Gérez et distribuez l'aide alimentaire, médicale, éducative et vestimentaire aux familles dans le besoin.",
+      "familyManagement": "Gestion des Familles",
+      "familyManagementDesc": "Enregistrez les familles, suivez leurs besoins, statut social et historique d'aide reçue.",
+      "analytics": "Analyses & Rapports",
+      "analyticsDesc": "Tableaux de bord en temps réel et statistiques pour mesurer l'impact de votre organisation.",
+      "multiLanguage": "Multi-Langue",
+      "multiLanguageDesc": "Support complet du français, anglais et arabe avec mise en page RTL.",
+      "accessibility": "Accessibilité",
+      "accessibilityDesc": "Conforme WCAG AA avec contraste élevé, mise à l'échelle du texte et synthèse vocale."
+    },
+    "contact": {
+      "title": "Contactez-Nous",
+      "subtitle": "Des questions ? Nous serions ravis de vous entendre.",
+      "email": "contact@omnia-charity.org",
+      "phone": "+216 XX XXX XXX",
+      "address": "Tunis, Tunisie",
+      "sendMessage": "Envoyer le Message",
+      "name": "Votre Nom",
+      "message": "Votre Message"
     },
     "impact": {
       "title": "Notre Impact",
       "families": "Familles Aidées",
+      "visits": "Visites Réalisées",
+      "regions": "Régions Actives",
       "funds": "Fonds Distribués",
       "volunteers": "Bénévoles Actifs",
       "countries": "Pays Desservis"
@@ -173,6 +205,7 @@
   "home": {
     "welcome": "Bienvenue",
     "welcomeMessage": "Bienvenue sur OMNIA, votre plateforme de suivi d'aide caritative",
+    "viewAll": "Voir Tout",
     "createVisit": "Planifier une Visite",
     "createCampaign": "Créer une Campagne",
     "upcomingVisits": "Visites à Venir",

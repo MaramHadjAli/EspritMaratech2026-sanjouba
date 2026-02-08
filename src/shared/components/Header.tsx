@@ -55,7 +55,7 @@ const Header: React.FC = () => {
             <img
               src="/assets/images/logo.jpg"
               alt={t('common.appName')}
-              className="h-10 w-auto rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105"
+              className="h-10 w-16 rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105 object-cover"
             />
           </NavLink>
 
@@ -157,13 +157,13 @@ const Header: React.FC = () => {
               </div>
             </button>
 
-            {/* User Name Badge */}
+            {/* User Name + Logout combined */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full">
               <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold uppercase">
-                {user?.name?.charAt(0) || user?.fullName?.charAt(0) || 'U'}
+                {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
               </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-24 truncate">
-                {user?.name || user?.fullName || 'User'}
+              <span className="text-sm font-semibold text-gray-800 dark:text-white max-w-32 truncate">
+                {user?.name || user?.email?.split('@')[0] || ''}
               </span>
             </div>
 
@@ -216,10 +216,10 @@ const Header: React.FC = () => {
             <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-700 mt-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold uppercase">
-                  {user?.name?.charAt(0) || 'U'}
+                  {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name || user?.fullName}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name || user?.email?.split('@')[0]}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role?.toLowerCase()}</p>
                 </div>
               </div>
