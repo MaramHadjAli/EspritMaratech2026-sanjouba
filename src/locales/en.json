@@ -109,17 +109,49 @@
   },
   "landing": {
     "hero": {
+      "badge": "Charitable Aid Management Platform",
       "title": "OMNIA - United to Help",
-      "subtitle": "A comprehensive platform for tracking and managing charitable aid",
-      "cta": "Get Started"
+      "titlePart1": "Together we build solidarity with",
+      "subtitle": "Track visits, distribute aid, manage families and monitor the impact of your charitable actions — all in one platform.",
+      "cta": "Get Started",
+      "signIn": "Sign In"
     },
     "about": {
       "title": "About OMNIA",
-      "description": "OMNIA is a dedicated platform for tracking and managing charitable aid. Our mission is to facilitate aid distribution and improve transparency in charitable work."
+      "description": "OMNIA is a complete platform designed for charitable organizations. We enable transparent aid tracking, field visit coordination, family needs management, and real-time impact monitoring.",
+      "mission": "Our mission is to digitize and optimize charitable work to ensure every aid reaches those who need it most."
+    },
+    "features": {
+      "title": "Key Features",
+      "subtitle": "Everything you need to manage your charitable activities",
+      "visitTracking": "Visit Tracking",
+      "visitTrackingDesc": "Plan, schedule, and track field visits with geolocation and team assignments.",
+      "aidDistribution": "Aid Distribution",
+      "aidDistributionDesc": "Manage and distribute food, medical, educational and clothing aid to families in need.",
+      "familyManagement": "Family Management",
+      "familyManagementDesc": "Register families, track their needs, social status and history of received aid.",
+      "analytics": "Analytics & Reports",
+      "analyticsDesc": "Real-time dashboards and statistics to measure your organization's impact.",
+      "multiLanguage": "Multi-Language",
+      "multiLanguageDesc": "Full support for French, English and Arabic with RTL layout.",
+      "accessibility": "Accessibility",
+      "accessibilityDesc": "WCAG AA compliant with high contrast, text scaling and text-to-speech."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "subtitle": "Have questions? We'd love to hear from you.",
+      "email": "contact@omnia-charity.org",
+      "phone": "+216 XX XXX XXX",
+      "address": "Tunis, Tunisia",
+      "sendMessage": "Send Message",
+      "name": "Your Name",
+      "message": "Your Message"
     },
     "impact": {
       "title": "Our Impact",
       "families": "Families Helped",
+      "visits": "Visits Completed",
+      "regions": "Active Regions",
       "funds": "Funds Distributed",
       "volunteers": "Active Volunteers",
       "countries": "Countries Reached"
@@ -128,6 +160,7 @@
   "home": {
     "welcome": "Welcome",
     "welcomeMessage": "Welcome to OMNIA, your charitable aid tracking platform",
+    "viewAll": "View All",
     "createVisit": "Schedule Visit",
     "createCampaign": "Create Campaign",
     "upcomingVisits": "Upcoming Visits",

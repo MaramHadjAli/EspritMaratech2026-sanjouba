@@ -136,7 +136,7 @@ const HomePage: React.FC = () => {
           <div>
             <WelcomeText 
               greeting={t('home.welcome') || 'Welcome,'} 
-              name={user?.name || 'User'}
+              name={user?.name || user?.email?.split('@')[0] || ''}
               className="mb-3"
             />
             <p className="text-lg text-gray-500 dark:text-gray-400 animate-fade-in-up opacity-0" style={{ animationDelay: '2.5s', animationFillMode: 'forwards' }}>
