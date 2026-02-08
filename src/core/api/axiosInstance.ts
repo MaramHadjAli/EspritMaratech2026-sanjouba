@@ -5,7 +5,8 @@
 
 import axios, { AxiosRequestConfig } from 'axios'
 
-const API_BASE_URL = 'http://192.168.1.187:3000'
+// Use the browser's current hostname so it works on both localhost and phone (via LAN IP)
+const API_BASE_URL = `http://${window.location.hostname}:3000`
 
 type RetriableAxiosConfig = AxiosRequestConfig & {
   _retry?: boolean
