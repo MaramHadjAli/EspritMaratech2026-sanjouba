@@ -108,6 +108,7 @@ const Header: React.FC = () => {
 
   // Check if user can access dashboard (admin or employee only)
   const canAccessDashboard = user?.role === 'ADMIN' || user?.role === 'EMPLOYEE'
+  const isAdmin = user?.role === 'ADMIN'
 
   // Navigation items
   const navItems = [
@@ -115,6 +116,7 @@ const Header: React.FC = () => {
     { path: '/dashboard', label: t('navigation.dashboard'), show: canAccessDashboard },
     { path: '/visits', label: t('navigation.visits'), show: true },
     { path: '/families', label: t('navigation.families'), show: true },
+    { path: '/employees/add', label: t('navigation.addEmployee') || 'Add Employee', show: isAdmin },
   ]
 
   // Language options with flags

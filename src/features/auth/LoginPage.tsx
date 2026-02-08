@@ -260,12 +260,15 @@ const LoginPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Contact admin message */}
+          {/* Register link */}
           <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            <span>{t('auth.noAccount')} </span>
-            <span className="text-primary-600 dark:text-primary-400 font-semibold">
-              {t('auth.contactAdmin')}
-            </span>
+            <span>{t('auth.noAccount') || "Don't have an account?"} </span>
+            <Link
+              to="/register"
+              className="text-primary-600 dark:text-primary-400 font-semibold hover:underline focus:outline-2 focus:outline-offset-2 focus:outline-primary-500"
+            >
+              {t('auth.register') || 'Register'}
+            </Link>
           </div>
         </div>
 

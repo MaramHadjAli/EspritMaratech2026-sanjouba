@@ -83,9 +83,10 @@ const HomePage: React.FC = () => {
       try {
         setLoading(true)
         
-        // Fetch upcoming visits from /event/upcoming
-        const visitsData = await visitService.getUpcomingVisits(5)
-        const visits = Array.isArray(visitsData) ? visitsData : (visitsData.data || [])
+        // Fetch upcoming visits
+        const response = await visitService.getUpcomingVisits()
+        const visitsData = response?.data ?? response
+        const visits = Array.isArray(visitsData) ? visitsData : []
         
         const mappedVisits: Visit[] = visits.slice(0, 5).map((visit: any) => ({
           id: visit.id || '',

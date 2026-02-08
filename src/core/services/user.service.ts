@@ -82,6 +82,20 @@ class UserService {
     })
     return response.data
   }
+
+  /**
+   * Create employee (admin-only)
+   * Uses POST /user endpoint with CreateUserDto
+   */
+  async createEmployee(data: {
+    name: string
+    email: string
+    password: string
+    phone?: string
+  }): Promise<any> {
+    const response = await axiosInstance.post('/user', data)
+    return response.data
+  }
 }
 
 export const userService = new UserService()
