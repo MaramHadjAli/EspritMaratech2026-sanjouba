@@ -5,11 +5,11 @@
 
 export interface ChartConfig {
   id: string
-  type: 'visits_timeline' | 'aid_pie' | 'family_size' | 'priority_families' | 'cities_visits_heatmap' | 'cities_families_metric' |
-        'cities_families_bar' | 'cities_visits_bar' | 'time_families_line' | 'time_visits_line' | 'time_needy_line' |
-        'aids_frequency_bar' | 'aids_type_pie' | 'aids_type_region_bar' | 'families_histogram_bar' | 
-        'families_vulnerability_pie' | 'visits_completion_stat' | 'deposits_summary_stat' | 'users_activity_bar' |
-        'financial_distributed_stat' | 'cities_active_stat' | 'families_count_stat' | 'visits_count_stat'
+    type: 'visits_timeline' | 'aid_pie' | 'family_size' | 'priority_families' | 'cities_visits_heatmap' | 'cities_families_heatmap' | 'cities_families_metric' |
+      'cities_families_bar' | 'cities_visits_bar' | 'time_families_line' | 'time_visits_line' | 'time_needy_line' |
+      'aids_frequency_bar' | 'aids_type_pie' | 'aids_type_region_bar' | 'families_histogram_bar' | 
+      'families_vulnerability_pie' | 'visits_completion_stat' | 'deposits_summary_stat' | 'deposits_utilization_bar' | 'users_activity_bar' |
+      'financial_distributed_stat' | 'cities_active_stat' | 'families_count_stat' | 'visits_count_stat'
   title: string
   gridCol: number // 1-4 (Tailwind grid columns)
   gridRow: number // rows it spans
@@ -27,6 +27,22 @@ const DASHBOARD_LAYOUT_KEY = 'dashboardLayout'
 const defaultLayout: DashboardLayout = {
   isLocked: true,
   charts: [
+    {
+      id: 'cities-families-heatmap',
+      type: 'cities_families_heatmap',
+      title: 'Families Heatmap',
+      gridCol: 4,
+      gridRow: 1,
+      enabled: true,
+    },
+    {
+      id: 'deposits-utilization-bar',
+      type: 'deposits_utilization_bar',
+      title: 'Deposits Utilization',
+      gridCol: 2,
+      gridRow: 1,
+      enabled: true,
+    },
     {
       id: 'visits-timeline',
       type: 'visits_timeline',

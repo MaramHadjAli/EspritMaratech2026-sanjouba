@@ -12,16 +12,33 @@ import { dashboardService } from '@services/dashboard.service'
 import { locationService } from '@services/location.service'
 
 export interface ChartComponentProps {
-  isEditMode?: boolean
-  isDragging?: boolean
-  onDragStart?: (e: React.DragEvent<HTMLDivElement>, chartId: string) => void
-  chartId: string
+  isEditMode?: boolean;
+  isDragging?: boolean;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>, chartId: string) => void;
+  chartId: string;
   data: {
-    timeline?: Array<{ label: string; value: number }>
-    aids?: Array<{ label: string; value: number }>
-    familySizes?: Array<{ label: string; value: number }>
-    priorityFamilies?: any[]
-  }
+    timeline?: Array<{ label: string; value: number }>;
+    aids?: Array<{ label: string; value: number }>;
+    familySizes?: Array<{ label: string; value: number }>;
+    priorityFamilies?: any[];
+    citiesFamilies?: Array<{ label: string; value: number }>;
+    citiesVisits?: Array<{ label: string; value: number }>;
+    timeFamilies?: Array<{ label: string; value: number }>;
+    timeVisits?: Array<{ label: string; value: number }>;
+    timeNeedy?: Array<{ label: string; value: number }>;
+    aidsFrequency?: Array<{ label: string; value: number }>;
+    aidsType?: Array<{ label: string; value: number }>;
+    aidsTypeRegion?: Array<{ label: string; value: number }>;
+    familiesHistogram?: Array<{ label: string; value: number }>;
+    familiesVulnerability?: Array<{ label: string; value: number }>;
+    usersActivity?: Array<{ label: string; value: number }>;
+    visitsCompletion?: number;
+    depositsSummary?: any[];
+    financialDistributed?: number;
+    citiesActive?: number;
+    familiesCount?: number;
+    visitsCount?: number;
+  };
 }
 
 export const VisitsTimelineChart: React.FC<ChartComponentProps> = ({
@@ -230,6 +247,124 @@ export const PriorityFamiliesChart: React.FC<ChartComponentProps> = ({
   )
 }
 
+  // Families Heatmap (Geographical Distribution)
+  export const CitiesFamiliesHeatmap: React.FC<ChartComponentProps> = ({ isEditMode, chartId, data }) => {
+    const [mapData, setMapData] = React.useState<any>(null);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const extractData = (payload: any) => payload?.data ?? payload;
+          const toArray = (value: any) => (Array.isArray(value) ? value : []);
+          const getCountFrom = (item: any) => {
+            const keys = ['familyCount', 'count', 'value', 'total'];
+            for (const key of keys) {
+              const value = item?.[key];
+              if (typeof value === 'number') return value;
+            }
+            return 0;
+          };
+          const response = await dashboardService.getCitiesFamilies();
+          const cityStats = toArray(extractData(response))
+            .map((item: any) => ({
+              city: item?.city || item?.name || item?.label,
+              count: getCountFrom(item),
+            }))
+            .filter((item: any) => Boolean(item.city));
+          const normalizeBbox = (bbox: number[]) => {
+            const [a, b, c, d] = bbox;
+            const looksLikeLatLatLngLng = Math.abs(a) <= 90 && Math.abs(b) <= 90 && Math.abs(c) <= 180 && Math.abs(d) <= 180;
+            const looksLikeLngLatLngLat = Math.abs(a) <= 180 && Math.abs(b) <= 90 && Math.abs(c) <= 180 && Math.abs(d) <= 90;
+            if (looksLikeLngLatLngLat && !looksLikeLatLatLngLng) {
+              return { minLat: b, maxLat: d, minLng: a, maxLng: c };
+            }
+            return { minLat: a, maxLat: b, minLng: c, maxLng: d };
+          };
+          const boundaryResults = await Promise.all(
+            cityStats.map(async ({ city, count }: { city: string; count: number }) => {
+              try {
+                const boundaryResponse = await locationService.getCityBoundary(city);
+                const boundary = extractData(boundaryResponse);
+                const bbox = boundary?.bbox;
+                if (!bbox || bbox.length !== 4) return null;
+                const { minLat, maxLat, minLng, maxLng } = normalizeBbox(bbox);
+                const lat = (minLat + maxLat) / 2;
+                const lng = (minLng + maxLng) / 2;
+                return [lat, lng, Math.max(1, count)] as [number, number, number];
+              } catch (error) {
+                console.warn(`Failed to load boundary for ${city}:`, error);
+                return null;
+              }
+            })
+          );
+          const heatmapPoints = boundaryResults.filter((point): point is [number, number, number] => Array.isArray(point));
+          setMapData(heatmapPoints);
+        } catch (error) {
+          console.error('Failed to fetch heatmap data:', error);
+          setMapData([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    }, []);
+    return (
+      <Card bordered className={`p-6 h-full ${isEditMode ? 'border-2 border-primary-400' : ''}`}>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Families Heatmap</h3>
+        {loading ? (
+          <div className="h-96 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+            <p className="text-gray-500">Loading map...</p>
+          </div>
+        ) : (
+          <TunisiaHeatmap heatmapData={mapData || []} />
+        )}
+      </Card>
+    );
+  };
+
+  // Deposits Utilization Bar Chart
+  export const DepositsUtilizationBarChart: React.FC<ChartComponentProps> = ({ isEditMode, chartId, data }) => {
+    const deposits = Array.isArray(data.depositsSummary) ? data.depositsSummary : [];
+    const barData = useMemo(
+      () => ({
+        labels: deposits.map((d: any) => d.name || d.id || 'Deposit'),
+        datasets: [
+          {
+            label: 'Utilization Rate (%)',
+            data: deposits.map((d: any) => Math.round((d.utilizationRate || 0) * 100)),
+            backgroundColor: '#f59e0b',
+            borderColor: '#f59e0b',
+            borderWidth: 1,
+          },
+        ],
+      }),
+      [deposits]
+    );
+    const options = useMemo(
+      () => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 0 },
+        plugins: { legend: { display: true, position: 'top' as const } },
+        scales: { y: { beginAtZero: true, max: 100 } },
+      }),
+      []
+    );
+    return (
+      <Card bordered className={`p-6 h-full ${isEditMode ? 'border-2 border-primary-400' : ''}`}>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Deposits Utilization</h3>
+        {deposits.length > 0 ? (
+          <div style={{ height: '300px', position: 'relative' }}>
+            <Bar data={barData} options={options} />
+          </div>
+        ) : (
+          <div className="h-64 flex items-center justify-center text-gray-500">No data available</div>
+        )}
+      </Card>
+    );
+  };
+
 export const CitiesVisitsHeatmap: React.FC<ChartComponentProps> = ({
   isEditMode,
   chartId,
@@ -326,6 +461,7 @@ export const CitiesVisitsHeatmap: React.FC<ChartComponentProps> = ({
     </Card>
   )
 }
+
 
 // Tunisia Heatmap Component
 interface TunisiaHeatmapProps {

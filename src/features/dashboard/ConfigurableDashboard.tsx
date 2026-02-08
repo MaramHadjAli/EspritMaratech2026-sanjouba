@@ -29,6 +29,8 @@ import {
   FamilySizeBarChart,
   PriorityFamiliesChart,
   CitiesVisitsHeatmap,
+  CitiesFamiliesHeatmap,
+  DepositsUtilizationBarChart,
   GenericBarChart,
   GenericLineChart,
   GenericPieChart,
@@ -353,6 +355,8 @@ const ConfigurableDashboard: React.FC = () => {
         return <PriorityFamiliesChart key={chart.id} {...commonProps} />
       case 'cities_visits_heatmap':
         return <CitiesVisitsHeatmap key={chart.id} {...commonProps} />
+        case 'cities_families_heatmap':
+          return <CitiesFamiliesHeatmap key={chart.id} {...commonProps} />
       case 'cities_families_bar':
         return (
           <GenericBarChart
@@ -364,6 +368,8 @@ const ConfigurableDashboard: React.FC = () => {
             color="#10b981"
           />
         )
+        case 'deposits_utilization_bar':
+          return <DepositsUtilizationBarChart key={chart.id} {...commonProps} />
       case 'cities_visits_bar':
         return (
           <GenericBarChart
