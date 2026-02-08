@@ -107,18 +107,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hasUser: !!response.user
       })
       
-      // Store token in localStorage first
+      // Token is already stored in localStorage by authService.login
       setToken(response.token)
       
-      // Fetch full user data from getCurrentUser endpoint
-      const userResponse = await authService.getCurrentUser()
-      const fullUserData = (userResponse as any)?.data ?? userResponse
-      const normalizedUser = normalizeUser(fullUserData)
+      // Use user data from login response directly instead of calling getCurrentUser
+      // This avoids timing issues with token propagation
+      const normalizedUser = normalizeUser(response.user)
       
       setUser(normalizedUser)
       if (normalizedUser) {
         localStorage.setItem('authUser', JSON.stringify(normalizedUser))
-        console.log('🔐 [AuthContext] Stored full user data from getCurrentUser endpoint')
+        console.log('🔐 [AuthContext] Stored user data from login response')
       }
       
       console.log('🔐 [AuthContext] State updated - isAuthenticated should be true now')
@@ -136,18 +135,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await authService.signup(data)
       
-      // Store token in localStorage first
+      // Token is already stored in localStorage by authService.signup
       setToken(response.token)
       
-      // Fetch full user data from getCurrentUser endpoint
-      const userResponse = await authService.getCurrentUser()
-      const fullUserData = (userResponse as any)?.data ?? userResponse
-      const normalizedUser = normalizeUser(fullUserData)
+      // Use user data from signup response directly instead of calling getCurrentUser
+      // This avoids timing issues with token propagation
+      const normalizedUser = normalizeUser(response.user)
       
       setUser(normalizedUser)
       if (normalizedUser) {
         localStorage.setItem('authUser', JSON.stringify(normalizedUser))
-        console.log('🔐 [AuthContext] Stored full user data from getCurrentUser endpoint')
+        console.log('🔐 [AuthContext] Stored user data from signup response')
       }
       return response
     } catch (error) {

@@ -15,11 +15,12 @@ import { TextInput } from '@components/TextInput'
 import { PasswordInput } from '@components/PasswordInput'
 import { FormField } from '@components/FormField'
 import { Card } from '@components/Card'
+import { userService } from '@services/user.service'
 
 const AddEmployeePage: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { signup, user } = useAuth()
+  const { user } = useAuth()
   const { addNotification } = useNotification()
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
@@ -140,19 +141,15 @@ const AddEmployeePage: React.FC = () => {
     }
 
     try {
-      await signup({
+      await userService.createEmployee({
         name: formData.name,
-        fullName: formData.name,
         email: formData.email,
-        phoneNumber: formData.phoneNumber,
         password: formData.password,
-        confirmPassword: formData.confirmPassword,
-        dateOfBirth: '',
-        location: '',
+        phone: formData.phoneNumber,
       })
       addNotification({
         type: 'success',
-        message: t('auth.employeeAddedSuccess'),
+        message: t('auth.employeeAddedSuccess') || 'Employee added successfully',
         duration: 3000,
       })
       setFormData({

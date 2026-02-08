@@ -99,7 +99,7 @@ export const visitService = {
    * Join a visit as a team member
    */
   joinVisit: async (visitId: string): Promise<ApiResponse<Visit>> => {
-    const response = await axiosInstance.post(`/visit/${visitId}/join`)
+    const response = await axiosInstance.post(`/user/me/join-visit/${visitId}`)
     return response.data
   },
 

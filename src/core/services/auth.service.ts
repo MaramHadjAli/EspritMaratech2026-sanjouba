@@ -16,19 +16,19 @@ export const authService = {
       const response = await axiosInstance.post('/auth/login', { email, password })
       console.log('✅ Login response:', response.data)
 
-      const { token, accessToken, refreshToken, user } = response.data.data || response.data
-      const resolvedToken = token || accessToken
+      const { accessToken, refreshToken, user } = response.data
+      const token = accessToken
 
-      if (!resolvedToken || !user) {
+      if (!token || !user) {
         throw new Error('Invalid response format: missing token or user data')
       }
 
-      localStorage.setItem('authToken', resolvedToken)
+      localStorage.setItem('authToken', token)
       if (refreshToken) {
         localStorage.setItem('refreshToken', refreshToken)
       }
       localStorage.setItem('authUser', JSON.stringify(user))
-      return { token: resolvedToken, refreshToken, user }
+      return { token, refreshToken, user }
     } catch (error: any) {
       console.error('❌ Login error:', {
         message: error.message,
@@ -42,11 +42,16 @@ export const authService = {
   },
 
   /**
-   * Register new user
+   * Register new user (normal user with role: USER)
    */
   signup: async (data: SignupFormData): Promise<any> => {
-    const response = await axiosInstance.post('/auth/signup', data)
-    const { token, refreshToken, user } = response.data.data || response.data
+    const response = await axiosInstance.post('/auth/register', {
+      name: data.name || data.fullName,
+      email: data.email,
+      password: data.password,
+    })
+    const { accessToken, refreshToken, user } = response.data
+    const token = accessToken
     localStorage.setItem('authToken', token)
     if (refreshToken) {
       localStorage.setItem('refreshToken', refreshToken)
