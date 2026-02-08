@@ -30,3 +30,5 @@ export { SelectInput, default as SelectInputComponent } from './SelectInput'
 
 // Specialized
 export { default as CurrentVisitRedirect } from './CurrentVisitRedirect'
+export { StepProgressBar } from './StepProgressBar'
+export type { Step } from './StepProgressBar'
