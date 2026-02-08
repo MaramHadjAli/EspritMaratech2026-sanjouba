@@ -74,10 +74,12 @@ export const AccessibleModal: React.FC<AccessibleModalProps> = ({
     // Add event listener
     document.addEventListener('keydown', handleKeyDown)
 
-    // Focus first button in modal
-    const firstButton = modalRef.current?.querySelector('button')
-    if (firstButton) {
-      setTimeout(() => firstButton.focus(), 0)
+    // Focus first interactive element in modal (prefer inputs)
+    const firstFocusable = modalRef.current?.querySelector(
+      'input, select, textarea, button, [href], [tabindex]:not([tabindex="-1"])'
+    ) as HTMLElement | null
+    if (firstFocusable) {
+      setTimeout(() => firstFocusable.focus(), 0)
     }
 
     return () => {

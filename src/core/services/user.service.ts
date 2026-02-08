@@ -3,10 +3,19 @@
  * Handles user profile and account management API calls
  */
 
+import axiosInstance from '../api/axiosInstance'
 import { User, UpdateUserData, ChangePasswordData } from '@types'
 
 class UserService {
   private baseUrl = '/api/users'
+
+  /**
+   * Get current user's active visit
+   */
+  async getCurrentVisit(): Promise<any> {
+    const response = await axiosInstance.get('/user/me/current-visit')
+    return response.data
+  }
 
   /**
    * Get user profile by ID
@@ -62,6 +71,16 @@ class UserService {
     // })
     // return response.json()
     return Promise.resolve({ url: '' })
+  }
+
+  /**
+   * Search users by username
+   */
+  async searchUsernames(query: string): Promise<any> {
+    const response = await axiosInstance.get('/user/employees/usernames', {
+      params: { q: query },
+    })
+    return response.data
   }
 }
 

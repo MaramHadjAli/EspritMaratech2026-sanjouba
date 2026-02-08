@@ -12,6 +12,7 @@ import { Spinner } from '@components/Spinner'
 import { Card } from '@components/Card'
 import { Badge } from '@components/Badge'
 import { Button } from '@components/Button'
+import CreateAidDistributionModal from './CreateAidDistributionModal'
 import type { Visit } from '@/shared/types'
 
 const VisitDetailPage: React.FC = () => {
@@ -21,6 +22,7 @@ const VisitDetailPage: React.FC = () => {
   const { success, error } = useToast()
   const [visit, setVisit] = useState<Visit | null>(null)
   const [loading, setLoading] = useState(true)
+  const [aidModalOpen, setAidModalOpen] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -31,24 +33,9 @@ const VisitDetailPage: React.FC = () => {
     const fetchVisit = async () => {
       try {
         setLoading(true)
-        // Mock visit for now - in real app would fetch by ID
-        const mockVisit: Visit = {
-          id: id || '1',
-          startDate: new Date().toISOString(),
-          endDate: new Date(Date.now() + 86400000).toISOString(),
-          city: 'Sample City',
-          region: 'Sample Region',
-          isActive: true,
-          isCompleted: false,
-          statsComputed: false,
-          // UI-only fields
-          campaignName: 'Sample Campaign',
-          address: 'Sample Address',
-          description: 'Sample description',
-          personCount: 10,
-          familiesCount: 3,
-        }
-        setVisit(mockVisit)
+        const response = await visitService.getVisitById(id as string)
+        const resolvedVisit = (response as any)?.data ?? response
+        setVisit(resolvedVisit)
       } catch (err) {
         error('Error loading visit')
         navigate('/visits')
@@ -60,15 +47,19 @@ const VisitDetailPage: React.FC = () => {
     if (id) {
       fetchVisit()
     }
-  }, [id, user, navigate, error])
+  }, [id, user, navigate])
 
   const handleDelete = async () => {
     if (!visit || !confirm('Delete this visit?')) return
 
     try {
-      // Note: deleteVisit would be called here
-      success('Visit deleted')
-      navigate('/visits')
+      const response = await visitService.deleteVisit(visit.id)
+      if ((response as any)?.success || (response as any)?.data) {
+        success('Visit deleted')
+        navigate('/visits')
+      } else {
+        error('Error deleting visit')
+      }
     } catch (err) {
       error('Error deleting visit')
     }
@@ -120,6 +111,12 @@ const VisitDetailPage: React.FC = () => {
             </button>
             <div className="flex gap-3">
               <Button
+                onClick={() => setAidModalOpen(true)}
+                className="bg-success hover:bg-success-600"
+              >
+                Create Aid Distribution
+              </Button>
+              <Button
                 onClick={() => navigate(`/visits/${visit.id}/edit`)}
                 variant="ghost"
               >
@@ -137,22 +134,22 @@ const VisitDetailPage: React.FC = () => {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    {visit.campaignName}
+                    Visit to {visit.city}, {visit.region}
                   </h1>
                   <p className="text-gray-600 dark:text-gray-400">
-                    {visit.address}
+                    {visit.city}, {visit.region}
                   </p>
                 </div>
                 <Badge
                   variant={
-                    visit.status === 'ACTIVE'
+                    visit.isActive
                       ? 'success'
-                      : visit.status === 'COMPLETED'
+                      : visit.isCompleted
                       ? 'info'
                       : 'warning'
                   }
                 >
-                  {visit.status}
+                  {visit.isActive ? 'ACTIVE' : visit.isCompleted ? 'COMPLETED' : 'PLANNED'}
                 </Badge>
               </div>
             </div>
@@ -160,26 +157,26 @@ const VisitDetailPage: React.FC = () => {
             <div className="grid md:grid-cols-4 gap-4">
               <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  Families
+                  Team Members
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {visit.familiesCount || 0}
+                  {visit.users?.length || 0}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  People
+                  Start Date
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {visit.personCount}
+                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  {new Date(visit.startDate).toLocaleDateString()}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  Date
+                  End Date
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  N/A
+                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                  {new Date(visit.endDate).toLocaleDateString()}
                 </p>
               </div>
               <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800">
@@ -187,7 +184,7 @@ const VisitDetailPage: React.FC = () => {
                   Duration
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  N/A
+                  {Math.ceil((new Date(visit.endDate).getTime() - new Date(visit.startDate).getTime()) / (1000 * 60 * 60 * 24))} days
                 </p>
               </div>
             </div>
@@ -202,48 +199,46 @@ const VisitDetailPage: React.FC = () => {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  Campaign Name
+                  Location
                 </p>
                 <p className="text-gray-900 dark:text-white">
-                  {visit.campaignName}
+                  {visit.city}, {visit.region}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  Address
+                  Coordinates
                 </p>
                 <p className="text-gray-900 dark:text-white">
-                  {visit.address}
+                  {visit.latitude}, {visit.longitude}
                 </p>
               </div>
 
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                  Description
+                  Notes
                 </p>
                 <p className="text-gray-900 dark:text-white">
-                  {visit.description || 'No description provided'}
+                  {visit.notes || 'No notes provided'}
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    Visit Date
-                  </p>
-                  <p className="text-gray-900 dark:text-white">
-                    N/A
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                    Location
-                  </p>
-                  <p className="text-gray-900 dark:text-white">
-                    {visit.address || 'Not specified'}
-                  </p>
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  Team Members
+                </p>
+                <div className="space-y-2">
+                  {visit.users && visit.users.length > 0 ? (
+                    visit.users.map((user: any) => (
+                      <div key={user.id} className="flex items-center gap-2 text-gray-900 dark:text-white">
+                        <span className="font-medium">{user.name}</span>
+                        <span className="text-gray-500 dark:text-gray-400">({user.email})</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-900 dark:text-white">No team members assigned</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -252,40 +247,54 @@ const VisitDetailPage: React.FC = () => {
           {/* Stats */}
           <Card bordered className="p-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Statistics
+              Visit Information
             </h2>
 
             <div className="grid md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-primary-50 dark:bg-primary-900/20">
                 <p className="text-sm text-primary-600 dark:text-primary-400 mb-1">
-                  Total Families
+                  Active Status
                 </p>
                 <p className="text-3xl font-bold text-primary-900 dark:text-primary-100">
-                  {visit.familiesCount || 0}
+                  {visit.isActive ? 'Yes' : 'No'}
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-success-50 dark:bg-success-900/20">
                 <p className="text-sm text-success-600 dark:text-success-400 mb-1">
-                  Total People
+                  Completed
                 </p>
                 <p className="text-3xl font-bold text-success-900 dark:text-success-100">
-                  {visit.personCount}
+                  {visit.isCompleted ? 'Yes' : 'No'}
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-info-50 dark:bg-info-900/20">
                 <p className="text-sm text-info-600 dark:text-info-400 mb-1">
-                  Status
+                  Stats Computed
                 </p>
-                <p className="text-3xl font-bold text-info-900 dark:text-info-100 capitalize">
-                  {visit.status?.toLowerCase()}
+                <p className="text-3xl font-bold text-info-900 dark:text-info-100">
+                  {visit.statsComputed ? 'Yes' : 'No'}
                 </p>
               </div>
             </div>
           </Card>
         </div>
       </div>
+
+      {/* Aid Distribution Modal */}
+      {visit && (
+        <CreateAidDistributionModal
+          isOpen={aidModalOpen}
+          visitId={visit.id}
+          onClose={() => setAidModalOpen(false)}
+          onSuccess={() => {
+            setAidModalOpen(false)
+            success('Aid distributed successfully')
+            // Optionally refresh visit data here
+          }}
+        />
+      )}
     </>
   )
 }

@@ -207,12 +207,19 @@ export interface Visit {
 }
 
 export interface CreateVisitData {
-  campaignName: string
+  startDate: string
+  endDate?: string
+  notes?: string
+  userIds?: string[]
+  latitude?: number
+  longitude?: number
+  // Legacy fields (for backward compatibility)
+  campaignName?: string
   campaignType?: CampaignType
   description?: string
-  date: string
+  date?: string
   time?: string
-  location: {
+  location?: {
     latitude: number
     longitude: number
   }
