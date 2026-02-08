@@ -268,15 +268,15 @@ const Header: React.FC = () => {
                 </div>
               </button>
 
-            {/* User Name + Logout combined */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full">
-              <div className="w-7 h-7 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-bold uppercase">
-                {user?.name?.charAt(0) || user?.name?.charAt(0) || 'U'}
+              {/* User badge — hidden < md, compact on md, full on lg */}
+              <div className="hidden md:flex items-center gap-1.5 lg:gap-2 px-2 lg:px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full">
+                <div className="w-6 h-6 lg:w-7 lg:h-7 rounded-full bg-primary-500 flex items-center justify-center text-white text-[10px] lg:text-xs font-bold uppercase">
+                  {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                </div>
+                <span className="hidden lg:inline text-sm font-semibold text-gray-800 dark:text-white max-w-32 truncate">
+                  {user?.name || user?.email?.split('@')[0] || ''}
+                </span>
               </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 max-w-24 truncate">
-                {user?.name || user?.name || 'User'}
-              </span>
-            </div>
 
               {/* Logout — icon-only on md, icon+text on lg */}
               <button
@@ -358,37 +358,66 @@ const Header: React.FC = () => {
             </div>
           </div>
 
-        {/* Mobile Menu */}
-        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="py-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
-            {navItems.filter(item => item.show).map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={({ isActive }) =>
-                  `block px-4 py-3 text-base font-medium rounded-lg transition-colors
-                  ${isActive 
-                    ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30' 
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-            
-            {/* Mobile User Info */}
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-700 mt-2">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold uppercase">
-                  {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name || user?.name}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role?.toLowerCase()}</p>
-                </div>
-              </div>
+          {/* Navigation Links */}
+          <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            {visibleNavItems.map((item) => {
+              const Icon = NavIcons[item.path]
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={closeSidebar}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
+                    ${isActive 
+                      ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 shadow-sm' 
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                    }`
+                  }
+                  style={{ minHeight: 48 }}
+                >
+                  {({ isActive }) => (
+                    <>
+                      {Icon && <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500'}`} />}
+                      {item.label}
+                      {isActive && (
+                        <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              )
+            })}
+          </nav>
+
+          {/* Sidebar Footer: Language + Accessibility + Logout */}
+          <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-4 space-y-3">
+            {/* Language pills */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">{currentLang.flag}</span>
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code as 'fr' | 'ar' | 'en')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors
+                    ${language === lang.code
+                      ? 'bg-primary-500 text-white shadow-sm'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }
+                  `}
+                  style={{ minHeight: 36 }}
+                >
+                  {lang.code.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* Accessibility in sidebar */}
+            <div className="flex items-center justify-between sm:hidden">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {t('accessibility.fontSize') || 'Text size'}
+              </span>
+              <AccessibilityControls />
             </div>
 
             {/* Logout */}
