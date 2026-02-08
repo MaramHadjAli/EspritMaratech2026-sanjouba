@@ -109,16 +109,35 @@
   "navigation": {
     "home": "Accueil",
     "dashboard": "Tableau de bord",
-    "visits": "Visites",
     "families": "Familles",
-    "aid": "Aide",
-    "campaigns": "Campagnes",
-    "history": "Historique",
+    "visits": "Visites",
+    "aids": "Aides",
+    "employees": "Employés",
+    "addEmployee": "Ajouter Employé",
     "settings": "Paramètres",
-    "profile": "Profil",
-    "contact": "Contact",
-    "help": "Aide",
     "logout": "Déconnexion"
+  },
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "subtitle": "Données en temps réel depuis les endpoints",
+    "overview": "Aperçu",
+    "statistics": "Statistiques",
+    "totalFamilies": "Nombre Total de Familles",
+    "totalVisits": "Total Visites",
+    "totalAid": "Aide Totale Distribuée",
+    "activeVisits": "Visites Actives",
+    "volunteerCount": "Bénévoles Actifs",
+    "activeCampaigns": "Campagnes Actives",
+    "totalBeneficiaries": "Bénéficiaires Totaux",
+    "aidDistributed": "Aides Distribuées",
+    "activeRegions": "Régions Actives",
+    "visitsTimeline": "Chronologie des Visites",
+    "aidDistribution": "Distribution des Aides",
+    "editLayout": "Modifier la disposition",
+    "chartTitle": "Tendance de Distribution d'Aide",
+    "monthlyStats": "Statistiques Mensuelles",
+    "topCategories": "Catégories d'Aide Principales",
+    "recentDistribution": "Distributions Récentes"
   },
   "accessibility": {
     "title": "Accessibilité",
@@ -150,7 +169,12 @@
     "closeNotification": "Fermer la notification",
     "notificationAdded": "Nouvelle notification : {{message}}",
     "formError": "Le formulaire contient des erreurs. Veuillez vérifier avant d'envoyer",
-    "fieldError": "{{field}} : {{error}}"
+    "fieldError": "{{field}} : {{error}}",
+    "colorBlindMode": "Mode daltonien",
+    "normal": "Normal",
+    "deuteranopia": "Deutéranopie",
+    "protanopia": "Protanopie", 
+    "tritanopia": "Tritanopie"
   },
   "landing": {
     "hero": {
@@ -214,21 +238,6 @@
     "noVisits": "Aucune visite planifiée",
     "recentActivity": "Activité Récente",
     "activities": "Activités"
-  },
-  "dashboard": {
-    "title": "Tableau de Bord",
-    "overview": "Aperçu",
-    "statistics": "Statistiques",
-    "totalFamilies": "Nombre Total de Familles",
-    "totalAid": "Aide Totale Distribuée",
-    "activeVisits": "Visites Actives",
-    "volunteerCount": "Bénévoles Actifs",
-    "activeCampaigns": "Campagnes Actives",
-    "totalBeneficiaries": "Bénéficiaires Totaux",
-    "chartTitle": "Tendance de Distribution d'Aide",
-    "monthlyStats": "Statistiques Mensuelles",
-    "topCategories": "Catégories d'Aide Principales",
-    "recentDistribution": "Distributions Récentes"
   },
   "visits": {
     "title": "Visites",
@@ -409,5 +418,13 @@
     "pattern": "Veuillez entrer un {{field}} valide",
     "passwordRequirements": "Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial",
     "invalidPhone": "Veuillez entrer un numéro de téléphone valide"
+  },
+  "offline": {
+    "noConnection": "Mode hors ligne",
+    "workOffline": "Vos données seront sauvegardées localement",
+    "pendingSync": "{{count}} action(s) en attente de synchronisation",
+    "syncing": "Synchronisation en cours...",
+    "syncSuccess": "{{count}} action(s) synchronisée(s) ✓",
+    "syncFailed": "{{count}} action(s) échouée(s)"
   }
 }

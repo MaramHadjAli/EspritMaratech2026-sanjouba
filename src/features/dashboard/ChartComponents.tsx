@@ -11,6 +11,20 @@ import { Card } from '@components/Card'
 import { dashboardService } from '@services/dashboard.service'
 import { locationService } from '@services/location.service'
 
+// Accessible color palette for charts
+const getAccessibleColors = (): string[] => [
+  '#2563eb', // blue
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#8b5cf6', // violet
+  '#14b8a6', // teal
+  '#06b6d4', // cyan
+  '#ec4899', // pink
+  '#84cc16', // lime
+  '#f97316', // orange
+]
+
 export interface ChartComponentProps {
   isEditMode?: boolean;
   isDragging?: boolean;
@@ -115,7 +129,7 @@ export const AidPieChart: React.FC<ChartComponentProps> = ({
       datasets: [
         {
           data: (data.aids || []).map(item => item.value),
-          backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'],
+          backgroundColor: getAccessibleColors(),
           borderColor: '#fff',
           borderWidth: 2,
         },
@@ -552,11 +566,13 @@ const TunisiaHeatmap: React.FC<TunisiaHeatmapProps> = ({ heatmapData }) => {
   }, [heatmapData])
 
   return (
-    <div
-      ref={mapRef}
-      className="h-96 rounded-lg border border-gray-200 dark:border-gray-700"
-      style={{ backgroundColor: '#f3f4f6' }}
-    />
+    <div className="relative overflow-hidden rounded-lg">
+      <div
+        ref={mapRef}
+        className="h-96 rounded-lg border border-gray-200 dark:border-gray-700"
+        style={{ backgroundColor: '#f3f4f6' }}
+      />
+    </div>
   )
 }
 
@@ -709,7 +725,16 @@ export const GenericPieChart: React.FC<{
   )
 }
 
-// Stat Card
+// Stat Card with Premium Gradient + Hover + Glow
+const STAT_GRADIENTS = [
+  'from-blue-600 to-blue-800',
+  'from-emerald-600 to-emerald-800',
+  'from-amber-600 to-amber-800',
+  'from-purple-600 to-purple-800',
+  'from-rose-600 to-rose-800',
+  'from-cyan-600 to-cyan-800',
+]
+
 export const StatCard: React.FC<{
   isEditMode?: boolean
   chartId: string
@@ -717,20 +742,46 @@ export const StatCard: React.FC<{
   value: number | string
   unit?: string
   icon?: string
-}> = ({ isEditMode, title, value, unit, icon }) => {
+  gradientIndex?: number
+}> = ({ isEditMode, chartId, title, value, unit, icon, gradientIndex = 0 }) => {
+  const gradient = STAT_GRADIENTS[gradientIndex % STAT_GRADIENTS.length]
+  
   return (
-    <Card bordered className={`p-6 h-full ${isEditMode ? 'border-2 border-primary-400' : ''}`}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
-            {typeof value === 'number' ? value.toLocaleString() : value}
-            {unit && <span className="text-sm ml-1">{unit}</span>}
-          </p>
+    <div
+      className={`
+        relative overflow-hidden rounded-2xl p-6 h-full
+        bg-gradient-to-br ${gradient}
+        shadow-lg hover:shadow-2xl hover:shadow-current/20
+        transform hover:-translate-y-1
+        transition-all duration-300 ease-out
+        border border-white/10
+        group
+        ${isEditMode ? 'ring-2 ring-primary-400 ring-offset-2' : ''}
+      `}
+    >
+      {/* Glow effect */}
+      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      {/* Background glow circle */}
+      <div className="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10 blur-2xl group-hover:bg-white/20 transition-colors" />
+      
+      <div className="relative z-10">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-medium text-white/80 uppercase tracking-wide">
+            {title}
+          </span>
+          {icon && (
+            <div className="p-2 rounded-lg bg-white/20 backdrop-blur-sm text-2xl">
+              {icon}
+            </div>
+          )}
         </div>
-        {icon && <div className="text-4xl">{icon}</div>}
+        <p className="text-4xl font-bold text-white tracking-tight">
+          {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
+          {unit && <span className="text-lg ml-1 font-normal opacity-80">{unit}</span>}
+        </p>
       </div>
-    </Card>
+    </div>
   )
 }
 

@@ -535,3 +535,179 @@ body {
     display: none;
   }
 }
+
+/* ===========================================
+   Leaflet Map Fixes
+   Prevents map controls from overflowing container
+   =========================================== */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+.leaflet-control-container {
+  position: absolute;
+  z-index: 1;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 1 !important;
+}
+
+.leaflet-pane {
+  z-index: 0 !important;
+}
+
+.leaflet-tile-pane {
+  z-index: 0 !important;
+}
+
+.leaflet-overlay-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-marker-pane {
+  z-index: 2 !important;
+}
+
+.leaflet-popup-pane {
+  z-index: 3 !important;
+}
+
+/* ===========================================
+   Color Universal Design (CUD) - Daltonien Modes
+   WCAG AA Accessible Color Palette
+   =========================================== */
+
+/* CSS Variables pour les graphiques - Mode Normal */
+:root {
+  --chart-1: #4477AA;
+  --chart-2: #66BB66;
+  --chart-3: #EE6677;
+  --chart-4: #CCBB44;
+  --chart-5: #AA3377;
+  --chart-6: #66CCEE;
+  --status-success: #22C55E;
+  --status-error: #EF4444;
+  --status-warning: #F59E0B;
+  --status-info: #3B82F6;
+}
+
+/* Deutéranopie (difficulté rouge-vert, le plus courant) */
+[data-color-mode="deuteranopia"] {
+  --chart-1: #0077BB;
+  --chart-2: #33BBEE;
+  --chart-3: #EE7733;
+  --chart-4: #CCBB44;
+  --chart-5: #AA3377;
+  --chart-6: #009988;
+  --status-success: #0077BB;
+  --status-error: #EE7733;
+  --status-warning: #CCBB44;
+  --status-info: #33BBEE;
+}
+
+/* Protanopie (rouge faible) */
+[data-color-mode="protanopia"] {
+  --chart-1: #0077BB;
+  --chart-2: #33BBEE;
+  --chart-3: #EE7733;
+  --chart-4: #CCBB44;
+  --chart-5: #AA3377;
+  --chart-6: #009988;
+  --status-success: #0077BB;
+  --status-error: #EE7733;
+  --status-warning: #CCBB44;
+  --status-info: #33BBEE;
+}
+
+/* Tritanopie (difficulté bleu-jaune) */
+[data-color-mode="tritanopia"] {
+  --chart-1: #CC3311;
+  --chart-2: #009988;
+  --chart-3: #EE3377;
+  --chart-4: #33BBEE;
+  --chart-5: #AA3377;
+  --chart-6: #BBBBBB;
+  --status-success: #009988;
+  --status-error: #CC3311;
+  --status-warning: #EE3377;
+  --status-info: #33BBEE;
+}
+
+/* Classes utilitaires pour les couleurs accessibles */
+.chart-color-1 { color: var(--chart-1); background-color: var(--chart-1); }
+.chart-color-2 { color: var(--chart-2); background-color: var(--chart-2); }
+.chart-color-3 { color: var(--chart-3); background-color: var(--chart-3); }
+.chart-color-4 { color: var(--chart-4); background-color: var(--chart-4); }
+.chart-color-5 { color: var(--chart-5); background-color: var(--chart-5); }
+.chart-color-6 { color: var(--chart-6); background-color: var(--chart-6); }
+
+.status-success { color: var(--status-success); }
+.status-error { color: var(--status-error); }
+.status-warning { color: var(--status-warning); }
+.status-info { color: var(--status-info); }
+
+.bg-status-success { background-color: var(--status-success); }
+.bg-status-error { background-color: var(--status-error); }
+.bg-status-warning { background-color: var(--status-warning); }
+.bg-status-info { background-color: var(--status-info); }
+
+/* ===== COLOR BLIND MODES ===== */
+:root {
+  --color-chart-1: #3B82F6;
+  --color-chart-2: #22C55E;
+  --color-chart-3: #EF4444;
+  --color-chart-4: #F59E0B;
+  --color-chart-5: #8B5CF6;
+  --color-chart-6: #06B6D4;
+  --color-success: #22C55E;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #3B82F6;
+}
+
+[data-color-mode="deuteranopia"],
+[data-color-mode="protanopia"] {
+  --color-chart-1: #0077BB;
+  --color-chart-2: #33BBEE;
+  --color-chart-3: #EE7733;
+  --color-chart-4: #CCBB44;
+  --color-chart-5: #AA3377;
+  --color-chart-6: #009988;
+  --color-success: #0077BB;
+  --color-error: #EE7733;
+  --color-warning: #CCBB44;
+  --color-info: #33BBEE;
+}
+
+[data-color-mode="tritanopia"] {
+  --color-chart-1: #CC3311;
+  --color-chart-2: #009988;
+  --color-chart-3: #EE3377;
+  --color-chart-4: #33BBEE;
+  --color-chart-5: #AA3377;
+  --color-chart-6: #BBBBBB;
+  --color-success: #009988;
+  --color-error: #CC3311;
+  --color-warning: #EE3377;
+  --color-info: #33BBEE;
+}
+
+/* Classes utilitaires pour utiliser les variables */
+.bg-chart-1 { background-color: var(--color-chart-1); }
+.bg-chart-2 { background-color: var(--color-chart-2); }
+.bg-chart-3 { background-color: var(--color-chart-3); }
+.bg-chart-4 { background-color: var(--color-chart-4); }
+.bg-chart-5 { background-color: var(--color-chart-5); }
+.bg-chart-6 { background-color: var(--color-chart-6); }
+
+.text-chart-1 { color: var(--color-chart-1); }
+.text-chart-2 { color: var(--color-chart-2); }
+.text-chart-3 { color: var(--color-chart-3); }
+.text-chart-4 { color: var(--color-chart-4); }
+
+.bg-status-success { background-color: var(--color-success); }
+.bg-status-error { background-color: var(--color-error); }
+.bg-status-warning { background-color: var(--color-warning); }
+.bg-status-info { background-color: var(--color-info); }

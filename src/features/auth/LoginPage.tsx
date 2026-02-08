@@ -1,14 +1,12 @@
 /**
- * Login Page - OMNIA Charity Tracking
- * Handles user authentication with email/password
- * Responsive, accessible (WCAG AA), supports dark mode and multiple languages
+ * Login Page – OMNIA Charity Tracking
+ * Final UI version: Enhanced colors, glassmorphism background, NGO identity
  */
 
 import React, { useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
-import { useTheme } from '@hooks/useTheme'
 import { validateEmail } from '@utils/validators'
 import { FormField } from '@components/FormField'
 import { Button } from '@components/Button'
@@ -19,14 +17,12 @@ import { CheckboxInput } from '@components/CheckboxInput'
 interface LoginFormErrors {
   email?: string
   password?: string
-  general?: string
 }
 
 const LoginPage: React.FC = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { login, isLoading } = useAuth()
-  const { isDarkMode } = useTheme()
 
   const [formData, setFormData] = useState({
     email: '',
@@ -38,8 +34,7 @@ const LoginPage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
 
-  // Validate form
-  const validateForm = useCallback((): boolean => {
+  const validateForm = useCallback(() => {
     const newErrors: LoginFormErrors = {}
 
     if (!formData.email.trim()) {
@@ -48,9 +43,7 @@ const LoginPage: React.FC = () => {
       newErrors.email = t('auth.invalidEmail')
     }
 
-    if (!formData.password) {
-      newErrors.password = t('auth.password') + ' ' + t('common.required')
-    } else if (formData.password.length < 6) {
+    if (!formData.password || formData.password.length < 6) {
       newErrors.password = t('auth.password') + ' ' + t('common.required')
     }
 
@@ -58,7 +51,6 @@ const LoginPage: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }, [formData, t])
 
-  // Handle input change
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value, type, checked } = e.currentTarget
@@ -67,155 +59,144 @@ const LoginPage: React.FC = () => {
         [name]: type === 'checkbox' ? checked : value,
       }))
       if (errors[name as keyof LoginFormErrors]) {
-        setErrors(prev => ({
-          ...prev,
-          [name]: undefined,
-        }))
+        setErrors(prev => ({ ...prev, [name]: undefined }))
       }
     },
     [errors]
   )
 
-  // Handle form submission
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
       setSubmitError(null)
 
-      if (!validateForm()) {
-        return
-      }
+      if (!validateForm()) return
 
       try {
-        console.log('🔐 Submitting login form with data:', { email: formData.email })
-        const response = await login(formData.email, formData.password)
-        console.log('✅ Login successful, response:', response)
+        await login(formData.email, formData.password)
+
         if (formData.rememberMe) {
           localStorage.setItem('rememberEmail', formData.email)
         } else {
           localStorage.removeItem('rememberEmail')
         }
+
         navigate('/home')
       } catch (error: any) {
-        console.error('❌ Login error caught:', error)
-        const errorMessage =
-          error?.response?.data?.message || 
-          error?.message || 
-          error?.toString() ||
-          t('auth.invalidCredentials')
-        console.error('Error message to display:', errorMessage)
-        setSubmitError(errorMessage)
+        setSubmitError(
+          error?.response?.data?.message ||
+            t('auth.invalidCredentials') ||
+            'Erreur de connexion'
+        )
       }
     },
     [formData, validateForm, login, navigate, t]
   )
 
-  // Handle enter key
-  const handleKeyPress = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && !isLoading) {
-        handleSubmit(e as any)
-      }
-    },
-    [handleSubmit, isLoading]
-  )
-
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center px-4 py-8"
-      style={{
-        backgroundImage: isDarkMode
-          ? "url('/images/backgrounds/bg-dark.png')"
-          : "url('/images/backgrounds/bg-light.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
+      className="
+        min-h-screen w-full flex items-center justify-center
+        px-4 sm:px-6 lg:px-8
+        relative overflow-hidden
+        bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]
+        from-emerald-100 via-white to-sky-100
+        dark:from-slate-900 dark:via-slate-900 dark:to-slate-800
+      "
     >
-      {/* Skip to main content link for accessibility */}
-      <a href="#login-form" className="sr-only focus:not-sr-only">
-        {t('common.skipToContent') || 'Aller au formulaire de connexion'}
-      </a>
+      {/* Decorative NGO shapes */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-300 rounded-full blur-3xl opacity-30 dark:bg-emerald-900" />
+      <div className="absolute top-1/3 -right-32 w-96 h-96 bg-sky-300 rounded-full blur-3xl opacity-30 dark:bg-sky-900" />
 
-      {/* Main container */}
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md relative z-10">
         {/* Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6">
+        <div
+          className="
+            bg-white/80 dark:bg-slate-800/80
+            backdrop-blur-xl
+            rounded-2xl
+            p-6 sm:p-8
+            shadow-xl shadow-emerald-200/40
+            dark:shadow-black/30
+            border border-white/40 dark:border-white/10
+            space-y-6
+          "
+        >
           {/* Header */}
-          <div className="text-center space-y-2">
-            <img
-              src={isDarkMode ? '/images/icons/logo-dark.png' : '/images/icons/logo-light.png'}
-              alt={t('common.appName')}
-              className="h-12 mx-auto"
-            />
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="text-center space-y-3">
+            <div
+              className="
+                mx-auto w-16 h-16 rounded-full
+                bg-gradient-to-br from-emerald-500 to-sky-400
+                flex items-center justify-center
+                text-white text-2xl
+                shadow-lg
+              "
+            >
+              🤍
+            </div>
+
+            <h1
+              className="
+                text-[clamp(1.6rem,4vw,2.1rem)]
+                font-extrabold
+                bg-gradient-to-r from-emerald-600 to-sky-500
+                bg-clip-text text-transparent
+              "
+            >
               {t('auth.login')}
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('common.tagline')}
+
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300">
+              Ensemble, chaque don devient une action concrète
             </p>
           </div>
 
-          {/* Error alert */}
+          {/* Error */}
           {submitError && (
             <div
               role="alert"
-              className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4"
-              aria-live="polite"
-              aria-atomic="true"
+              className="
+                bg-rose-50 dark:bg-rose-900/20
+                border border-rose-200 dark:border-rose-800
+                rounded-xl p-4
+              "
             >
-              <p className="text-sm text-red-800 dark:text-red-200">{submitError}</p>
+              <p className="text-sm text-rose-700 dark:text-rose-300">
+                {submitError}
+              </p>
             </div>
           )}
 
           {/* Form */}
-          <form
-            id="login-form"
-            onSubmit={handleSubmit}
-            onKeyPress={handleKeyPress}
-            className="space-y-4"
-            noValidate
-          >
-            {/* Email field */}
-            <FormField
-              label={t('auth.email')}
-              error={errors.email}
-              required
-            >
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <FormField label={t('auth.email')} error={errors.email} required>
               <TextInput
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="exemple@omnia.fr"
+                placeholder="exemple@omnia.org"
                 disabled={isLoading}
-                aria-required="true"
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? 'email-error' : undefined}
+                className="
+                  transition-all
+                  focus:ring-2 focus:ring-emerald-500
+                  focus:border-emerald-500
+                "
               />
             </FormField>
 
-            {/* Password field */}
-            <FormField
-              label={t('auth.password')}
-              error={errors.password}
-              required
-            >
+            <FormField label={t('auth.password')} error={errors.password} required>
               <PasswordInput
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="••••••••"
                 disabled={isLoading}
                 showPassword={showPassword}
                 onToggleShowPassword={() => setShowPassword(!showPassword)}
-                aria-required="true"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? 'password-error' : undefined}
               />
             </FormField>
 
-            {/* Remember me checkbox */}
             <div className="flex items-center justify-between">
               <CheckboxInput
                 id="remember-me"
@@ -223,60 +204,57 @@ const LoginPage: React.FC = () => {
                 label={t('auth.rememberMe')}
                 checked={formData.rememberMe}
                 onChange={handleInputChange}
-                disabled={isLoading}
               />
               <Link
                 to="/auth/forgot-password"
-                className="text-sm text-primary-600 dark:text-primary-400 hover:underline focus:outline-2 focus:outline-offset-2 focus:outline-primary-500"
-                aria-label={t('auth.forgotPassword')}
+                className="text-sm text-emerald-600 hover:underline"
               >
                 {t('auth.forgotPassword')}
               </Link>
             </div>
 
-            {/* Submit button */}
             <Button
               type="submit"
-              variant="primary"
               fullWidth
-              isLoading={isLoading}
-              disabled={isLoading}
               size="lg"
-              aria-busy={isLoading}
+              isLoading={isLoading}
+              className="
+                rounded-xl font-semibold text-white
+                bg-gradient-to-r from-emerald-600 to-sky-500
+                hover:from-emerald-700 hover:to-sky-600
+                transition-all duration-300
+                shadow-lg shadow-emerald-500/30
+                active:scale-95
+              "
             >
-              {isLoading ? t('common.loading') : t('auth.login')}
+              {isLoading ? t('common.loading') : 'Se connecter & aider'}
             </Button>
           </form>
 
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                {t('common.or') || 'ou'}
-              </span>
-            </div>
+          {/* NGO values */}
+          <div className="hidden sm:block text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
+            <p>🌍 Suivez l’impact de vos dons</p>
+            <p>🤝 Soutenez des projets transparents</p>
+            <p>📊 Actions visibles en temps réel</p>
           </div>
 
-          {/* Register link */}
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            <span>{t('auth.noAccount') || "Don't have an account?"} </span>
+          {/* Register */}
+          <div className="text-center text-sm text-slate-600 dark:text-slate-400">
+            <span>{t('auth.noAccount')} </span>
             <Link
               to="/register"
-              className="text-primary-600 dark:text-primary-400 font-semibold hover:underline focus:outline-2 focus:outline-offset-2 focus:outline-primary-500"
+              className="text-emerald-600 font-semibold hover:underline"
             >
-              {t('auth.register') || 'Register'}
+              Créer un compte
             </Link>
           </div>
         </div>
 
-        {/* Footer info */}
-        <div className="mt-6 text-center text-xs text-gray-500 dark:text-gray-400">
-          <p>
-            {t('common.secureConnection') || 'Connexion sécurisée'} • {t('common.privacyPolicy') || 'Politique de confidentialité'}
-          </p>
+        {/* Footer */}
+        <div className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
+          <p>🌱 Association humanitaire à impact social</p>
+          <p>🔒 Données sécurisées • Transparence garantie</p>
+          <p>© {new Date().getFullYear()} OMNIA Charity</p>
         </div>
       </div>
     </div>

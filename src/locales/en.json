@@ -1,4 +1,5 @@
 {
+  "addEmployee": "Add Employee",
   "common": {
     "appName": "OMNIA",
     "tagline": "Charity Tracking Platform",
@@ -374,5 +375,13 @@
     "notificationAdded": "New notification: {{message}}",
     "formError": "Form has errors. Please review before submitting",
     "fieldError": "{{field}}: {{error}}"
+  },
+  "offline": {
+    "noConnection": "Offline mode",
+    "workOffline": "Your data will be saved locally",
+    "pendingSync": "{{count}} action(s) pending sync",
+    "syncing": "Syncing...",
+    "syncSuccess": "{{count}} action(s) synced ✓",
+    "syncFailed": "{{count}} action(s) failed"
   }
 }

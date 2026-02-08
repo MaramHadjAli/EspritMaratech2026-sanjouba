@@ -1,4 +1,5 @@
 {
+  "addEmployee": "إضافة موظف",
   "common": {
     "appName": "أمنية",
     "tagline": "منصة تتبع المساعدة الخيرية",
@@ -374,5 +375,13 @@
     "notificationAdded": "إشعار جديد: {{message}}",
     "formError": "يحتوي النموذج على أخطاء. يرجى المراجعة قبل الإرسال",
     "fieldError": "{{field}}: {{error}}"
+  },
+  "offline": {
+    "noConnection": "وضع عدم الاتصال",
+    "workOffline": "سيتم حفظ بياناتك محليًا",
+    "pendingSync": "{{count}} إجراء(ات) في انتظار المزامنة",
+    "syncing": "جاري المزامنة...",
+    "syncSuccess": "تمت مزامنة {{count}} إجراء(ات) ✓",
+    "syncFailed": "فشل {{count}} إجراء(ات)"
   }
 }

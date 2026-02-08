@@ -5,8 +5,10 @@ import { ThemeProvider } from '@contexts/ThemeContext'
 import { LanguageProvider } from '@contexts/LanguageContext'
 import { NotificationProvider } from '@contexts/NotificationContext'
 import { AccessibilityProvider } from '@contexts/AccessibilityContext'
+import { OfflineProvider } from '@contexts/OfflineContext'
 import { useAuth } from '@hooks/useAuth'
 import { CurrentVisitRedirect } from '@components/CurrentVisitRedirect'
+import OfflineBanner from '@components/OfflineBanner'
 import LoginPage from '@features/auth/LoginPage'
 import RegisterPage from '@features/auth/RegisterPage'
 import AddEmployeePage from '@features/auth/AddEmployeePage'
@@ -117,16 +119,19 @@ function App() {
       <ThemeProvider>
         <LanguageProvider>
           <AccessibilityProvider>
-            <AuthProvider>
-              <NotificationProvider>
-                <Router>
-                  <CurrentVisitRedirect>
-                    <AppRoutes />
-                  </CurrentVisitRedirect>
-                  <Toast />
-                </Router>
-              </NotificationProvider>
-            </AuthProvider>
+            <OfflineProvider>
+              <AuthProvider>
+                <NotificationProvider>
+                  <Router>
+                    <CurrentVisitRedirect>
+                      <AppRoutes />
+                    </CurrentVisitRedirect>
+                    <Toast />
+                    <OfflineBanner />
+                  </Router>
+                </NotificationProvider>
+              </AuthProvider>
+            </OfflineProvider>
           </AccessibilityProvider>
         </LanguageProvider>
       </ThemeProvider>

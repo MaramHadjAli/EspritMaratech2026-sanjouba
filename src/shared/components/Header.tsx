@@ -5,6 +5,7 @@ import { useAuth } from '@hooks/useAuth'
 import { useTheme } from '@hooks/useTheme'
 import { useLanguage } from '@hooks/useLanguage'
 import AccessibilityControls from './AccessibilityControls'
+import ColorBlindToggle from './ColorBlindToggle'
 
 // Nav icons for sidebar (mobile only)
 const NavIcons: Record<string, React.FC<{ className?: string }>> = {
@@ -116,7 +117,7 @@ const Header: React.FC = () => {
     { path: '/dashboard', label: t('navigation.dashboard'), show: canAccessDashboard },
     { path: '/visits', label: t('navigation.visits'), show: true },
     { path: '/families', label: t('navigation.families'), show: true },
-    { path: '/employees/add', label: t('navigation.addEmployee') || 'Add Employee', show: isAdmin },
+    { path: '/employees/add', label: t('addEmployee') || 'Add Employee', show: isAdmin },
   ]
 
   // Language options with flags
@@ -249,6 +250,11 @@ const Header: React.FC = () => {
               {/* Accessibility Controls — hide on very small screens */}
               <div className="hidden sm:block">
                 <AccessibilityControls />
+              </div>
+
+              {/* Colorblind Mode Toggle */}
+              <div className="hidden sm:block">
+                <ColorBlindToggle />
               </div>
 
               {/* Dark Mode Toggle */}

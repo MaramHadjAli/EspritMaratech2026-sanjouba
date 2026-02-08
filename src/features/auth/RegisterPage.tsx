@@ -1,6 +1,6 @@
 /**
- * Register Page
- * Multi-step registration form with email verification
+ * Register Page – OMNIA Charity Tracking
+ * Multi-step registration • NGO style • Glassmorphism • Responsive
  */
 
 import React, { useState } from 'react'
@@ -8,13 +8,11 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { useToast } from '@hooks/useNotification'
-import { validateSignupForm, validatePhoneTN } from '@utils/validators'
+import { validatePhoneTN } from '@utils/validators'
 import { Button } from '@components/Button'
 import { TextInput } from '@components/TextInput'
 import { PasswordInput } from '@components/PasswordInput'
 import { FormField } from '@components/FormField'
-import { Card } from '@components/Card'
-import { Badge } from '@components/Badge'
 
 const RegisterPage: React.FC = () => {
   const { t } = useTranslation()
@@ -29,80 +27,58 @@ const RegisterPage: React.FC = () => {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
+    agreeToTerms: false,
     dateOfBirth: '',
     location: '',
-    agreeToTerms: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement
-    const checked = (e.target as HTMLInputElement).checked
-    setFormData((prev) => ({
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target
+    setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }))
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }))
+      setErrors(prev => ({ ...prev, [name]: '' }))
     }
   }
 
-  const validateStep = (stepNum: number): boolean => {
+  const validateStep = (current: number) => {
     const newErrors: Record<string, string> = {}
 
-    switch (stepNum) {
-      case 1:
-        if (!formData.name.trim()) {
-          newErrors.name = 'Name is required'
-        }
-        break
-      case 2:
-        if (!formData.email) {
-          newErrors.email = 'Email is required'
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-          newErrors.email = 'Invalid email format'
-        }
-        if (!formData.phoneNumber) {
-          newErrors.phoneNumber = t('validation.phoneRequired')
-        } else if (!validatePhoneTN(formData.phoneNumber)) {
-          newErrors.phoneNumber = t('validation.invalidPhoneFormat')
-        }
-        break
-      case 3:
-        if (!formData.password) {
-          newErrors.password = 'Password is required'
-        } else if (formData.password.length < 8) {
-          newErrors.password = 'Password must be at least 8 characters'
-        }
-        if (formData.password !== formData.confirmPassword) {
-          newErrors.confirmPassword = 'Passwords do not match'
-        }
-        if (!formData.agreeToTerms) {
-          newErrors.agreeToTerms = 'You must agree to the terms'
-        }
-        break
+    if (current === 1 && !formData.name.trim()) {
+      newErrors.name = 'Nom requis'
+    }
+
+    if (current === 2) {
+      if (!formData.email) newErrors.email = 'Email requis'
+      if (!formData.phoneNumber) {
+        newErrors.phoneNumber = 'Téléphone requis'
+      } else if (!validatePhoneTN(formData.phoneNumber)) {
+        newErrors.phoneNumber = 'Format téléphone invalide'
+      }
+    }
+
+    if (current === 3) {
+      if (formData.password.length < 8) {
+        newErrors.password = 'Minimum 8 caractères'
+      }
+      if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Mots de passe différents'
+      }
+      if (!formData.agreeToTerms) {
+        newErrors.agreeToTerms = 'Vous devez accepter les conditions'
+      }
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleNext = () => {
-    if (validateStep(step)) {
-      setStep((prev) => (prev + 1) as 1 | 2 | 3)
-    }
-  }
-
-  const handlePrevious = () => {
-    setStep((prev) => (prev - 1) as 1 | 2 | 3)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!validateStep(3)) {
-      return
-    }
+    if (!validateStep(3)) return
 
     try {
       await signup({
@@ -115,182 +91,154 @@ const RegisterPage: React.FC = () => {
         dateOfBirth: formData.dateOfBirth,
         location: formData.location,
       })
-      toast.success('Account created successfully! Redirecting to login...')
-      setTimeout(() => navigate('/login'), 2000)
+      toast.success('Compte créé avec succès 💚')
+      setTimeout(() => navigate('/login'), 1500)
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Registration failed')
-      setErrors({
-        submit: error.response?.data?.message || 'Registration failed. Please try again.',
-      })
+      toast.error(error?.response?.data?.message || 'Erreur inscription')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 px-4 py-8">
-      <Card className="w-full max-w-md" bordered>
-        {/* Header */}
-        <div className="flex justify-center mb-8">
-          <div className="w-12 h-12 bg-primary-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl">O</span>
+    <div
+      className="
+        min-h-screen flex items-center justify-center
+        px-4 sm:px-6 lg:px-8
+        relative overflow-hidden
+        bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]
+        from-emerald-100 via-white to-sky-100
+        dark:from-slate-900 dark:via-slate-900 dark:to-slate-800
+      "
+    >
+      {/* Decorative shapes */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-300 blur-3xl opacity-30 dark:bg-emerald-900" />
+      <div className="absolute top-1/3 -right-32 w-96 h-96 bg-sky-300 blur-3xl opacity-30 dark:bg-sky-900" />
+
+      <div className="w-full max-w-md relative z-10">
+        <div
+          className="
+            bg-white/80 dark:bg-slate-800/80
+            backdrop-blur-xl
+            rounded-2xl
+            p-6 sm:p-8
+            shadow-xl shadow-emerald-200/40
+            border border-white/40 dark:border-white/10
+            space-y-6
+          "
+        >
+          {/* Header */}
+          <div className="text-center space-y-3">
+            <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-sky-400 flex items-center justify-center text-white text-2xl shadow-lg">
+              🌱
+            </div>
+            <h1 className="text-[clamp(1.6rem,4vw,2.1rem)] font-extrabold bg-gradient-to-r from-emerald-600 to-sky-500 bg-clip-text text-transparent">
+              Créer un compte
+            </h1>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Rejoignez une communauté solidaire
+            </p>
           </div>
-        </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center mb-2">
-          Create Account
-        </h1>
-
-        {/* Progress Indicator */}
-        <div className="flex justify-between mb-8">
-          {[1, 2, 3].map((s) => (
-            <div key={s} className="flex flex-col items-center flex-1">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${
-                  step >= s
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                }`}
-              >
-                {s}
+          {/* Progress */}
+          <div className="flex justify-between">
+            {[1, 2, 3].map(s => (
+              <div key={s} className="flex flex-col items-center flex-1">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                    step >= s
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                  }`}
+                >
+                  {s}
+                </div>
+                <span className="text-xs mt-2 text-slate-500">
+                  {s === 1 ? 'Profil' : s === 2 ? 'Contact' : 'Sécurité'}
+                </span>
               </div>
-              <span className="text-xs mt-2 text-gray-600 dark:text-gray-400">
-                {s === 1 ? 'Personal' : s === 2 ? 'Contact' : 'Security'}
-              </span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {errors.submit && (
-            <div className="p-3 rounded-lg bg-danger-50 dark:bg-danger-900 border border-danger-200 dark:border-danger-800">
-              <p className="text-sm text-danger font-medium">{errors.submit}</p>
-            </div>
-          )}
-
-          {/* Step 1: Personal Info */}
-          {step === 1 && (
-            <>
-              <FormField label="Full Name" error={errors.name} required>
-                <TextInput
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Mohamed Ahmed"
-                />
-              </FormField>
-
-            </>
-          )}
-
-          {/* Step 2: Contact Info */}
-          {step === 2 && (
-            <>
-              <FormField label="Email" error={errors.email} required>
-                <TextInput
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your@email.com"
-                />
-              </FormField>
-              <FormField label="Phone" error={errors.phoneNumber} required>
-                <TextInput
-                  name="phoneNumber"
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  placeholder="+216 XX XXX XXX"
-                />
-              </FormField>
-            </>
-          )}
-
-          {/* Step 3: Security */}
-          {step === 3 && (
-            <>
-              <FormField label="Password" error={errors.password} required>
-                <PasswordInput
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </FormField>
-              <FormField label="Confirm Password" error={errors.confirmPassword} required>
-                <PasswordInput
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-              </FormField>
-              <div className="flex items-start">
-                <input
-                  type="checkbox"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleChange}
-                  className="mt-1 mr-2"
-                  id="terms"
-                />
-                <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-400">
-                  I agree to the{' '}
-                  <Link to="/terms" className="text-primary-500 hover:underline">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/privacy" className="text-primary-500 hover:underline">
-                    Privacy Policy
-                  </Link>
-                </label>
-              </div>
-            </>
-          )}
-
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            {step > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                fullWidth
-                onClick={handlePrevious}
-              >
-                Previous
-              </Button>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {step === 1 && (
+              <>
+                <FormField label="Nom complet" error={errors.name} required>
+                  <TextInput name="name" value={formData.name} onChange={handleChange} />
+                </FormField>
+                <FormField label="Date de naissance" error={errors.dateOfBirth} required>
+                  <TextInput name="dateOfBirth" type="date" value={formData.dateOfBirth} onChange={handleChange} />
+                </FormField>
+                <FormField label="Localisation" error={errors.location} required>
+                  <TextInput name="location" value={formData.location} onChange={handleChange} />
+                </FormField>
+              </>
             )}
-            {step < 3 && (
-              <Button
-                type="button"
-                fullWidth
-                onClick={handleNext}
-              >
-                Next
-              </Button>
+
+            {step === 2 && (
+              <>
+                <FormField label="Email" error={errors.email} required>
+                  <TextInput name="email" type="email" value={formData.email} onChange={handleChange} />
+                </FormField>
+                <FormField label="Téléphone" error={errors.phoneNumber} required>
+                  <TextInput name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+                </FormField>
+              </>
             )}
+
             {step === 3 && (
-              <Button
-                type="submit"
-                fullWidth
-              >
-                Create Account
-              </Button>
-            )}
-          </div>
-        </form>
+              <>
+                <FormField label="Mot de passe" error={errors.password} required>
+                  <PasswordInput name="password" value={formData.password} onChange={handleChange} />
+                </FormField>
+                <FormField label="Confirmer" error={errors.confirmPassword} required>
+                  <PasswordInput name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} />
+                </FormField>
 
-        {/* Login Link */}
-        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
-            Already have an account?{' '}
-            <Link
-              to="/login"
-              className="text-primary-500 hover:text-primary-600 font-medium transition-colors"
-            >
-              Sign in
+                <label className="flex gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <input type="checkbox" name="agreeToTerms" checked={formData.agreeToTerms} onChange={handleChange} />
+                  J’accepte les <Link to="/terms" className="text-emerald-600 underline">conditions</Link>
+                </label>
+              </>
+            )}
+
+            {/* Buttons */}
+            <div className="flex gap-3 pt-2">
+              {step > 1 && (
+                <Button type="button" variant="ghost" fullWidth onClick={() => setStep(s => (s - 1) as any)}>
+                  Précédent
+                </Button>
+              )}
+              {step < 3 && (
+                <Button type="button" fullWidth onClick={() => validateStep(step) && setStep(s => (s + 1) as any)}>
+                  Suivant
+                </Button>
+              )}
+              {step === 3 && (
+                <Button
+                  type="submit"
+                  fullWidth
+                  className="bg-gradient-to-r from-emerald-600 to-sky-500 text-white shadow-lg"
+                >
+                  Créer & aider
+                </Button>
+              )}
+            </div>
+          </form>
+
+          {/* Login */}
+          <div className="text-center text-sm text-slate-600 dark:text-slate-400">
+            Déjà inscrit ?{' '}
+            <Link to="/login" className="text-emerald-600 font-semibold hover:underline">
+              Se connecter
             </Link>
-          </p>
+          </div>
         </div>
-      </Card>
+
+        {/* Footer */}
+        <div className="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
+          🌍 OMNIA Charity • Ensemble pour un impact réel
+        </div>
+      </div>
     </div>
   )
 }

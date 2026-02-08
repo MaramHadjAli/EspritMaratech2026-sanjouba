@@ -4,6 +4,7 @@
  */
 
 import axios, { AxiosRequestConfig } from 'axios'
+import { offlineStorage } from '../services/offlineStorage'
 
 // Use the browser's current hostname so it works on both localhost and phone (via LAN IP)
 const API_BASE_URL = `http://${window.location.hostname}:3000`
@@ -89,11 +90,30 @@ axiosInstance.interceptors.request.use(
 
 // Add response interceptor to handle errors
 axiosInstance.interceptors.response.use(
-  response => response,
+  response => {
+    // Cache successful GET responses for offline use
+    const url = response.config.url || ''
+    if (response.config.method?.toUpperCase() === 'GET' && !isNoAuthEndpoint(url)) {
+      const cacheKey = `api_cache:${url}${response.config.params ? '?' + new URLSearchParams(response.config.params).toString() : ''}`
+      offlineStorage.setCachedData(cacheKey, response.data, 120).catch(() => {})
+    }
+    return response
+  },
   async error => {
     const originalRequest = error.config as RetriableAxiosConfig | undefined
     const status = error.response?.status
     const url = originalRequest?.url || ''
+
+    // If network error on a GET request, try to serve from cache
+    if (!error.response && originalRequest?.method?.toUpperCase() === 'GET') {
+      const cacheKey = `api_cache:${url}${originalRequest.params ? '?' + new URLSearchParams(originalRequest.params).toString() : ''}`
+      try {
+        const cached = await offlineStorage.getCachedData(cacheKey)
+        if (cached) {
+          return { data: cached, status: 200, statusText: 'OK (from cache)', config: originalRequest, headers: {} }
+        }
+      } catch { /* cache miss */ }
+    }
 
     // Don't handle 401s for auth endpoints themselves
     if (isNoAuthEndpoint(url)) {
