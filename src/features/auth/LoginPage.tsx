@@ -8,7 +8,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@hooks/useAuth'
 import { validateEmail } from '@utils/validators'
-import { FormField } from '@components/FormField'
+import { AccessibleFormField } from '@components/AccessibleFormField'
 import { Button } from '@components/Button'
 import { PasswordInput } from '@components/PasswordInput'
 import { TextInput } from '@components/TextInput'
@@ -33,6 +33,19 @@ const LoginPage: React.FC = () => {
   const [errors, setErrors] = useState<LoginFormErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
+
+  // Refs for auto-focus on error
+  const emailRef = React.useRef<HTMLInputElement>(null)
+  const passwordRef = React.useRef<HTMLInputElement>(null)
+
+  // Focus first error field on error
+  React.useEffect(() => {
+    if (errors.email && emailRef.current) {
+      emailRef.current.focus()
+    } else if (errors.password && passwordRef.current) {
+      passwordRef.current.focus()
+    }
+  }, [errors])
 
   const validateForm = useCallback(() => {
     const newErrors: LoginFormErrors = {}
@@ -152,50 +165,59 @@ const LoginPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Error */}
+
+          {/* Error - live region for screen readers */}
           {submitError && (
             <div
               role="alert"
-              className="
-                bg-rose-50 dark:bg-rose-900/20
-                border border-rose-200 dark:border-rose-800
-                rounded-xl p-4
-              "
+              aria-live="assertive"
+              className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-xl p-4"
             >
               <p className="text-sm text-rose-700 dark:text-rose-300">
+                <span className="sr-only">Erreur : </span>
                 {submitError}
               </p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <FormField label={t('auth.email')} error={errors.email} required>
+
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate aria-label={t('auth.login')}>
+            <AccessibleFormField label={t('auth.email')} error={errors.email} required>
               <TextInput
+                ref={emailRef}
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="exemple@omnia.org"
+                autoComplete="username"
+                inputMode="email"
+                aria-label={t('auth.email')}
+                aria-required="true"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
                 disabled={isLoading}
-                className="
-                  transition-all
-                  focus:ring-2 focus:ring-emerald-500
-                  focus:border-emerald-500
-                "
+                className="transition-all focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
-            </FormField>
+            </AccessibleFormField>
 
-            <FormField label={t('auth.password')} error={errors.password} required>
+            <AccessibleFormField label={t('auth.password')} error={errors.password} required>
               <PasswordInput
+                ref={passwordRef}
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
+                autoComplete="current-password"
+                aria-label={t('auth.password')}
+                aria-required="true"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? 'password-error' : undefined}
                 disabled={isLoading}
                 showPassword={showPassword}
                 onToggleShowPassword={() => setShowPassword(!showPassword)}
               />
-            </FormField>
+            </AccessibleFormField>
+
 
             <div className="flex items-center justify-between">
               <CheckboxInput
@@ -204,10 +226,13 @@ const LoginPage: React.FC = () => {
                 label={t('auth.rememberMe')}
                 checked={formData.rememberMe}
                 onChange={handleInputChange}
+                aria-label={t('auth.rememberMe')}
               />
               <Link
                 to="/auth/forgot-password"
                 className="text-sm text-emerald-600 hover:underline"
+                tabIndex={0}
+                aria-label={t('auth.forgotPassword')}
               >
                 {t('auth.forgotPassword')}
               </Link>
@@ -218,16 +243,10 @@ const LoginPage: React.FC = () => {
               fullWidth
               size="lg"
               isLoading={isLoading}
-              className="
-                rounded-xl font-semibold text-white
-                bg-gradient-to-r from-emerald-600 to-sky-500
-                hover:from-emerald-700 hover:to-sky-600
-                transition-all duration-300
-                shadow-lg shadow-emerald-500/30
-                active:scale-95
-              "
+              className="rounded-xl font-semibold text-white bg-gradient-to-r from-emerald-600 to-sky-500 hover:from-emerald-700 hover:to-sky-600 transition-all duration-300 shadow-lg shadow-emerald-500/30 active:scale-95"
+              aria-label={t('auth.login')}
             >
-              {isLoading ? t('common.loading') : 'Se connecter & aider'}
+              {isLoading ? t('common.loading') : t('auth.login')}
             </Button>
           </form>
 
@@ -244,8 +263,10 @@ const LoginPage: React.FC = () => {
             <Link
               to="/register"
               className="text-emerald-600 font-semibold hover:underline"
+              tabIndex={0}
+              aria-label={t('auth.register')}
             >
-              Créer un compte
+              {t('Register')}
             </Link>
           </div>
         </div>

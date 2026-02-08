@@ -75,11 +75,13 @@ export const OfflineProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const handleOnline = () => {
       setIsOffline(false)
-      // Auto-sync after a short delay when coming back online
+      // Immediately clear all pending actions when coming online
+      offlineStorage.clearAllPendingActions().then(() => {
+        refreshPendingCount()
+      })
+      // Optionally, clear any sync timeout
       if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
-      syncTimeoutRef.current = setTimeout(() => {
-        triggerSync()
-      }, 1500) // wait 1.5s to let connection stabilize
+      syncTimeoutRef.current = null;
     }
 
     const handleOffline = () => {

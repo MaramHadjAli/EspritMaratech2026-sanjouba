@@ -181,7 +181,7 @@ const LandingPage: React.FC = () => {
                 src="/assets/images/logo.jpg"
                 alt="OMNIA Logo"
                 className="w-14 h-12 rounded-xl object-cover border-2 border-white/30 shadow-lg"
-                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/omnia.jpg' }}
+                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/banner.jpg' }}
               />
               <span className="text-2xl font-bold text-white drop-shadow-lg tracking-tight">OMNIA</span>
             </div>
@@ -274,7 +274,7 @@ const LandingPage: React.FC = () => {
                 <div className="absolute inset-0 -m-12 rounded-full border border-white/5" />
                 
                 <div className="w-64 h-64 sm:w-72 sm:h-72 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-white/25 shadow-2xl">
-                  <img src="/assets/omnia.jpg" alt="OMNIA" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/logo.jpg' }} />
+                  <img src="/assets/banner.jpg" alt="OMNIA" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/assets/images/logo.jpg' }} />
                 </div>
 
                 {/* Floating icons */}
@@ -439,7 +439,7 @@ const LandingPage: React.FC = () => {
       <footer className="relative py-8 px-6 lg:px-8 bg-gray-900 dark:bg-gray-950 border-t border-gray-800">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm gap-4">
           <div className="flex items-center gap-3">
-            <img src="/assets/images/logo.jpg" alt="OMNIA" className="w-8 h-8 rounded-lg object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/assets/omnia.jpg' }} />
+            <img src="/assets/images/logo.jpg" alt="OMNIA" className="w-8 h-8 rounded-lg object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/assets/banner.jpg' }} />
             <span className="font-semibold text-white">OMNIA</span>
           </div>
           <p>© {new Date().getFullYear()} OMNIA. All rights reserved.</p>
