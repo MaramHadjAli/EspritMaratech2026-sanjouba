@@ -94,7 +94,7 @@ export const authService = {
    * Get current user profile
    */
   getCurrentUser: async (): Promise<ApiResponse<User>> => {
-    const response = await axiosInstance.get('/auth/me')
+    const response = await axiosInstance.get('/user/me')
     return response.data
   },
 

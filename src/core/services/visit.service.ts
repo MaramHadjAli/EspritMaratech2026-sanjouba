@@ -58,11 +58,31 @@ export const visitService = {
   },
 
   /**
+   * Get active visits
+   */
+  getActiveVisits: async (limit?: number): Promise<ApiResponse<Visit[]>> => {
+    const response = await axiosInstance.get('/visit/active', {
+      params: limit ? { limit } : {},
+    })
+    return response.data
+  },
+
+  /**
    * Get upcoming visits
    */
-  getUpcomingVisits: async (limit = 5): Promise<ApiResponse<Visit[]>> => {
+  getUpcomingVisits: async (limit?: number): Promise<ApiResponse<Visit[]>> => {
     const response = await axiosInstance.get('/visit/upcoming', {
-      params: { limit },
+      params: limit ? { limit } : {},
+    })
+    return response.data
+  },
+
+  /**
+   * Get previous/completed visits
+   */
+  getPreviousVisits: async (limit?: number): Promise<ApiResponse<Visit[]>> => {
+    const response = await axiosInstance.get('/visit/previous', {
+      params: limit ? { limit } : {},
     })
     return response.data
   },
